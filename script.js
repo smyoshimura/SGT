@@ -76,9 +76,10 @@ function addStudentToDom(studentObj) {
     var $new_student = $('<tr>');
     studentObj.dom_elem = $new_student;
 
-    $new_student.append($('<td>').text(studentObj.name));
-    $new_student.append($('<td>').text(studentObj.course));
-    $new_student.append($('<td>').text(studentObj.grade));
+    for (var i in inputIds)
+    {
+        $new_student.append($('<td>').text(studentObj[inputIds[i]]));
+    }
     $new_student.append($('<td>').append($('<button>',
         {
             type: 'button',
@@ -110,9 +111,9 @@ document.addEventListener("DOMContentLoaded", function(event)
     /*TEST CODE*/
     var student =
     {
-        name: 'Amanda Huggenkis',
+        studentName: 'Amanda Huggenkis',
         course: 'pranking',
-        grade: '97'
+        studentGrade: '97'
     };
     addStudentToDom(student);
     /*TEST CODE*/
