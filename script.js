@@ -67,16 +67,53 @@ function updateStudentList() {
  * into the .student_list tbody
  * @param studentObj
  */
-function addStudentToDom() {
+function addStudentToDom(studentObj) {
 
+    // This is the place where we will append the new student DOM object to
+    var $student_table = $('.student-list>tbody');
+
+    // This is the grandaddy container for all the student object data
+    var $new_student = $('<tr>');
+    studentObj.dom_elem = $new_student;
+
+    $new_student.append($('<td>').text(studentObj.name));
+    $new_student.append($('<td>').text(studentObj.course));
+    $new_student.append($('<td>').text(studentObj.grade));
+    $new_student.append($('<td>').append($('<button>',
+        {
+            type: 'button',
+            class: 'btn btn-danger btn-xs',
+            onclick: 'deleteEntry(this)'
+        }).text('Delete')));
+
+    $student_table.append($new_student);
+}
+function deleteEntry(button)
+{
+    button.parentElement.parentElement.remove(0);
 }
 /**
  * reset - resets the application to initial state. Global variables reset, DOM get reset to initial load state
  */
 function reset() {
     student_array = [];
+    $('div.student-list-container').append($('<h3>', {id: 'unavailable'}).append($('<b>').text('User Info Unavailable')));
 }
 
 /**
  * Listen for the document to load and reset the data to the initial state
  */
+document.addEventListener("DOMContentLoaded", function(event)
+{
+    reset();
+
+    /*TEST CODE*/
+    var student =
+    {
+        name: 'Amanda Huggenkis',
+        course: 'pranking',
+        grade: '97'
+    };
+    addStudentToDom(student);
+    /*TEST CODE*/
+});
