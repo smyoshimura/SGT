@@ -2,7 +2,6 @@
  * Define all global variables here
  */
 
-
 /**
  * student_array - global array to hold student objects
  * @type {Array}
@@ -12,12 +11,16 @@ var student_array = [];
  * inputIds - id's of the elements that are used to add students
  * @type {string[]}
  */
-var inputIds = ["studentName", "course", "studentGrade"];
+var inputIds = ['studentName', 'course', 'studentGrade'];
 /**
  * addClicked - Event Handler when user clicks the add button
  */
 function addClicked() {
+    console.log('test');
     addStudent();
+    console.log('test');
+    //updateData();
+    //calculateAverage();
 }
 /**
  * cancelClicked - Event Handler when user clicks the cancel button, should clear out student form
@@ -31,11 +34,23 @@ function cancelClicked() {
  * @return undefined
  */
 function addStudent() {
-
-    var newStudent = {
-
+    console.log('test');
+    var studentObject = {
+        //entry_id: ""
+        //name: "",
+        //course: "",
+        //grade: ""
     };
-    student_array.push(newStudent);
+    var temp = studentName;
+
+    for (var x in inputIds) {
+        var id_temp = inputIds[x];
+        var value = $('#' + id_temp).val();
+        studentObject[id_temp] = value;
+        console.log(studentObject);
+    }
+    student_array.push(studentObject);
+    return
 }
 /**
  * clearAddStudentForm - clears out the form values based on inputIds variable
@@ -49,25 +64,27 @@ function clearAddStudentForm() {
  */
 function calculateAverage() {
 
+    return
 }
 /**
  * updateData - centralized function to update the average and call student list update
  */
 function updateData() {
     updateStudentList();
+    calculateAverage();
 }
 /**
  * updateStudentList - loops through global student array and appends each objects data into the student-list-container > list-body
  */
 function updateStudentList() {
-
+    addStudentToDom();
 }
 /**
  * addStudentToDom - take in a student object, create html elements from the values and then append the elements
- * into the .student_list tbody
+ * into the .student_list body
  * @param studentObj
  */
-function addStudentToDom() {
+function addStudentToDom(studentObj) {
 
 }
 /**
@@ -80,3 +97,8 @@ function reset() {
 /**
  * Listen for the document to load and reset the data to the initial state
  */
+$(document).ready(function () {
+    console.log('loaded');
+    //reset();
+
+});
