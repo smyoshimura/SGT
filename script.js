@@ -11,7 +11,8 @@ var student_array = [];
  * inputIds - id's of the elements that are used to add students
  * @type {string[]}
  */
-var inputIds = ['studentName', 'course', 'studentGrade'];
+// The Ids will be defined in the reset() function.
+var inputIds = [];
 /**
  * addClicked - Event Handler when user clicks the add button
  */
@@ -56,7 +57,12 @@ function addStudent() {
  * clearAddStudentForm - clears out the form values based on inputIds variable
  *///Ryan
 function clearAddStudentForm() {
-
+    // Loop through the text inputs in the form,
+    // and set their values to a blank string.
+    for (var i in inputIds)
+    {
+        $('#' + inputIds[i]).val('');
+    }
 }
 /**
  * calculateAverage - loop through the global student array and calculate average grade and return that value
@@ -64,14 +70,14 @@ function clearAddStudentForm() {
  *///Stefanie
 function calculateAverage() {
 
-    return
+    return;
 }
 /**
  * updateData - centralized function to update the average and call student list update
  *///Ryan
 function updateData() {
+    $('.avgGrade').text(calculateAverage());
     updateStudentList();
-    calculateAverage();
 }
 /**
  * updateStudentList - loops through global student array and appends each objects data into the student-list-container > list-body
@@ -102,14 +108,14 @@ function addStudentToDom(studentObj) {
     $new_student.append($('<td>').append($('<button>',
         {
             type: 'button',
-            class: 'btn btn-danger btn-xs',
-            onclick: 'deleteEntry(this)'
+            class: 'btn btn-danger btn-xs delete-student',
+            onclick: 'removeStudentFromDom(this)'
         }).text('Delete')));
 
     $student_table.append($new_student);
 }
 //Ryan
-function deleteEntry(button)
+function removeStudentFromDom(button)
 {
     button.parentElement.parentElement.remove(0);
 }
@@ -117,8 +123,22 @@ function deleteEntry(button)
  * reset - resets the application to initial state. Global variables reset, DOM get reset to initial load state
  *///Ryan
 function reset() {
-    student_array = [];
+    // Empty out the table elements in the DOM
     $('div.student-list-container').append($('<h3>', {id: 'unavailable'}).append($('<b>').text('User Info Unavailable')));
+    var $delete_buttons = $('.delete-student');
+    for (var i = 0; i < $delete_buttons.length; i++)
+        removeStudentFromDom($delete_buttons[i]);
+
+
+    // Reset all global variables
+    student_array = [];
+    inputIds = [];
+
+
+    // Set the inputIds array elements
+    var $input_elems = $('.input-group>input[type=\"text\"], .input-group>input[type=\"number\"]');
+    for (var i = 0; i < $input_elems.length; i++)
+        inputIds.push($input_elems[i].getAttribute('id'));
 }
 
 /**
