@@ -19,7 +19,7 @@ function addClicked() {
     console.log('test');
     addStudent();
     console.log('test');
-    //updateData();
+    updateData();
     //calculateAverage();
 }
 /**
@@ -77,7 +77,9 @@ function updateData() {
  * updateStudentList - loops through global student array and appends each objects data into the student-list-container > list-body
  */
 function updateStudentList() {
-    addStudentToDom();
+    /*loop through global student array
+     * append each object's data */
+    addStudentToDom(student_array[0]);
 }
 /**
  * addStudentToDom - take in a student object, create html elements from the values and then append the elements
@@ -86,19 +88,53 @@ function updateStudentList() {
  */
 function addStudentToDom(studentObj) {
 
+    // This is the place where we will append the new student DOM object to
+    var $student_table = $('.student-list>tbody');
+
+    // This is the grandaddy container for all the student object data
+    var $new_student = $('<tr>');
+    studentObj.dom_elem = $new_student;
+
+    for (var i in inputIds)
+    {
+        $new_student.append($('<td>').text(studentObj[inputIds[i]]));
+    }
+    $new_student.append($('<td>').append($('<button>',
+        {
+            type: 'button',
+            class: 'btn btn-danger btn-xs',
+            onclick: 'deleteEntry(this)'
+        }).text('Delete')));
+
+    $student_table.append($new_student);
+}
+function deleteEntry(button)
+{
+    button.parentElement.parentElement.remove(0);
 }
 /**
  * reset - resets the application to initial state. Global variables reset, DOM get reset to initial load state
  */
 function reset() {
     student_array = [];
+    $('div.student-list-container').append($('<h3>', {id: 'unavailable'}).append($('<b>').text('User Info Unavailable')));
 }
 
 /**
  * Listen for the document to load and reset the data to the initial state
  */
-$(document).ready(function () {
-    console.log('loaded');
-    //reset();
 
+document.addEventListener("DOMContentLoaded", function(event)
+{
+    reset();
+
+    /*TEST CODE
+    var student =
+    {
+        studentName: 'Amanda Huggenkis',
+        course: 'pranking',
+        studentGrade: '97'
+    };
+    addStudentToDom(student);
+    TEST CODE*/
 });
