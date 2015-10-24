@@ -54,28 +54,28 @@ function addStudent() {
 }
 /**
  * clearAddStudentForm - clears out the form values based on inputIds variable
- */
+ *///Ryan
 function clearAddStudentForm() {
 
 }
 /**
  * calculateAverage - loop through the global student array and calculate average grade and return that value
  * @returns {number}
- */
+ *///Stefanie
 function calculateAverage() {
 
     return
 }
 /**
  * updateData - centralized function to update the average and call student list update
- */
+ *///Ryan
 function updateData() {
     updateStudentList();
     calculateAverage();
 }
 /**
  * updateStudentList - loops through global student array and appends each objects data into the student-list-container > list-body
- */
+ *///Stefanie
 function updateStudentList() {
     /*loop through global student array
      * append each object's data */
@@ -85,7 +85,7 @@ function updateStudentList() {
  * addStudentToDom - take in a student object, create html elements from the values and then append the elements
  * into the .student_list body
  * @param studentObj
- */
+ *///Ryan
 function addStudentToDom(studentObj) {
 
     // This is the place where we will append the new student DOM object to
@@ -108,13 +108,14 @@ function addStudentToDom(studentObj) {
 
     $student_table.append($new_student);
 }
+//Ryan
 function deleteEntry(button)
 {
     button.parentElement.parentElement.remove(0);
 }
 /**
  * reset - resets the application to initial state. Global variables reset, DOM get reset to initial load state
- */
+ *///Ryan
 function reset() {
     student_array = [];
     $('div.student-list-container').append($('<h3>', {id: 'unavailable'}).append($('<b>').text('User Info Unavailable')));
