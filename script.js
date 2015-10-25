@@ -42,7 +42,6 @@ function addStudent() {
         //course: "",
         //grade: ""
     };
-    var temp = studentName;
 
     for (var x in inputIds) {
         var id_temp = inputIds[x];
@@ -69,8 +68,14 @@ function clearAddStudentForm() {
  * @returns {number}
  *///Stefanie
 function calculateAverage() {
-
-    return;
+    var total_grades = 0;
+    var total_students = 0;
+    for (i in student_array) {
+        total_grades = total_grades + parseInt(student_array[i].studentGrade);
+        ++total_students;
+    }
+    var average = Math.round(total_grades/total_students);
+    return average;
 }
 /**
  * updateData - centralized function to update the average and call student list update
@@ -85,7 +90,8 @@ function updateData() {
 function updateStudentList() {
     /*loop through global student array
      * append each object's data */
-    addStudentToDom(student_array[0]);
+    //loop through and for each run addStudentToDom according to index
+    addStudentToDom(student_array[student_array.length - 1]);
 }
 /**
  * addStudentToDom - take in a student object, create html elements from the values and then append the elements
