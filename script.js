@@ -103,7 +103,10 @@ function addStudentToDom(studentObj) {
     var $student_table = $('.student-list>tbody');
 
     // This is the grandaddy container for all the student object data
-    var $new_student = $('<tr>');
+    var $new_student = $('<tr>',
+        {
+            class: 'student-row'
+        });
     studentObj.dom_elem = $new_student;
 
     for (var i in inputIds)
@@ -114,23 +117,50 @@ function addStudentToDom(studentObj) {
         {
             type: 'button',
             class: 'btn btn-danger btn-xs delete-student',
-            onclick: 'removeStudentFromDom(this)'
+            onclick: 'removeStudentFromDom(this.parentElement.parentElement)'
         }).text('Delete')));
 
     $student_table.append($new_student);
 
-    // Remove the "User Info Unavailable" label
-    var label = $('#unavailable');
-    if (label.parent() != null)
-        label.remove();
+    removeUnavailableLabelFromDom();
 }
+/**
+ * STUDENT-MADE FUNCTION
+ * TO BE AN EVENT-HANDLER ONLY!!!
+ * removeStudentFromDom - Removes a student row from the page
+ * @param student_elem - The top DOM container for the student to be removed.
+ */
 //Ryan
-function removeStudentFromDom(button)
+function removeStudentFromDom(student_elem)
 {
-    button.parentElement.parentElement.remove(0);
+    student_elem.remove(0);
 
-    var label = $('#unavailable');
-    if (label.parent() == null)
+    remaining_student_rows = $('.student-row');
+    if (remaining_student_rows.length == 0)
+        addUnavailableLabelToDom();
+}
+
+
+/**
+ * STUDENT-MADE FUNCTION
+ * addUnavailableLabelToDom - Adds the "User Info Unavailable" label to the DOM.
+ */
+function addUnavailableLabelToDom()
+{
+    // Only add if it's not already in the DOM
+    var label = document.getElementById('unavailable');
+    if (label == null)
+        $('div.student-list-container').append($('<h3>', {id: 'unavailable'}).append($('<b>').text('User Info Unavailable')));
+}
+
+/**
+ * STUDENT-MADE FUNCTION
+ * removeUnavailableLabelFromDom - Removes the "User Info Unavailable" label from the DOM
+ */
+function removeUnavailableLabelFromDom()
+{
+    var label = document.getElementById('unavailable');
+    if (label != null)
         label.remove();
 }
 /**
@@ -138,7 +168,7 @@ function removeStudentFromDom(button)
  *///Ryan
 function reset() {
     // Empty out the table elements in the DOM
-    $('div.student-list-container').append($('<h3>', {id: 'unavailable'}).append($('<b>').text('User Info Unavailable')));
+    addUnavailableLabelToDom();
     var $delete_buttons = $('.delete-student');
     for (var i = 0; i < $delete_buttons.length; i++)
         removeStudentFromDom($delete_buttons[i]);
