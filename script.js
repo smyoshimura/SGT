@@ -93,7 +93,6 @@ function updateStudentList() {
  * @param studentObj
  *///Ryan
 function addStudentToDom(studentObj) {
-
     // This is the place where we will append the new student DOM object to
     var $student_table = $('.student-list>tbody');
 
@@ -113,11 +112,20 @@ function addStudentToDom(studentObj) {
         }).text('Delete')));
 
     $student_table.append($new_student);
+
+    // Remove the "User Info Unavailable" label
+    var label = $('#unavailable');
+    if (label.parent() != null)
+        label.remove();
 }
 //Ryan
 function removeStudentFromDom(button)
 {
     button.parentElement.parentElement.remove(0);
+
+    var label = $('#unavailable');
+    if (label.parent() == null)
+        label.remove();
 }
 /**
  * reset - resets the application to initial state. Global variables reset, DOM get reset to initial load state
