@@ -74,15 +74,12 @@ function addStudent() {
  */
 function generateStudentId()
 {
-    var student_id = -1;
+    var student_id = 0;
 
-    function generate()
+    return function()
     {
-        student_id++;
-        return student_id;
-    }
-
-    return generate;
+        return student_id++;
+    };
 }
 
 /**
@@ -193,13 +190,13 @@ function calculateAverage() {
  *///Ryan
 function updateData() {
     $('.avgGrade').text(calculateAverage());
-
     updateStudentList();
 }
 /**
  * updateStudentList - loops through global student array and appends each objects data into the student-list-container > list-body
  *///Stefanie
 function updateStudentList() {
+
     addStudentToDom(student_array[student_array.length - 1]);
 }
 /**
@@ -216,7 +213,7 @@ function addStudentToDom(studentObj) {
         {
             class: 'student-row'
         });
-    studentObj.dom_elem = $new_student;
+    studentObj.dom_elem = $($new_student);
 
     for (var i in inputIds)
     {
