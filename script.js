@@ -71,6 +71,11 @@ function calculateAverage() {
         ++total_students;
     }
     var average = Math.round(total_grades/total_students);
+
+    if (isNaN(average)) {
+        average = 0;
+    }
+
     return average;
 }
 /**
@@ -78,6 +83,7 @@ function calculateAverage() {
  *///Ryan
 function updateData() {
     $('.avgGrade').text(calculateAverage());
+
     updateStudentList();
 }
 /**
@@ -129,6 +135,7 @@ function addStudentToDom(studentObj) {
 function deleteStudent(student_elem){
     removeStudentFromDom(student_elem);
     removeStudentFromArray(student_elem);
+    updateData();
 }
 
 /**
