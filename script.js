@@ -34,8 +34,8 @@ var ERROR_MESSAGE_CLASS_NAME = 3;
  * addClicked - Event Handler when user clicks the add button
  */
 function addClicked() {
-    addStudent();
-    updateData();
+    if (addStudent())
+        updateData();
 }
 /**
  * cancelClicked - Event Handler when user clicks the cancel button, should clear out student form
@@ -61,11 +61,12 @@ function addStudent() {
         console.log(studentObject);
     }
     if (checkForErrorsInForm(studentObject) == true)
-        return;
+        return false;
 
     studentObject.student_id = id_counter++;
 
     student_array.push(studentObject);
+    return true;
 }
 
 /**
