@@ -1,7 +1,7 @@
 /**
  * Define all global variables here
  */
-var id_counter = 0;
+var id_counter = generateStudentId();
 /**
  * student_array - global array to hold student objects
  * @type {Array}
@@ -46,13 +46,12 @@ function cancelClicked() {
 /**
  * addStudent - creates a student objects based on input fields in the form and adds the object to global student array
  *
- * @return undefined
+ * @return boolean
  */
 function addStudent() {
     console.log('test');
     removeErrorMessagesFromDom();
     var studentObject = {};
-
 
     for (var x in inputIds) {
         var id_temp = inputIds[x];
@@ -63,10 +62,27 @@ function addStudent() {
     if (checkForErrorsInForm(studentObject) == true)
         return false;
 
-    studentObject.student_id = id_counter++;
+    studentObject.student_id = id_counter();
 
     student_array.push(studentObject);
     return true;
+}
+
+/**
+ * generateStudentId - Closure function for generating student ID
+ * @returns {generate}
+ */
+function generateStudentId()
+{
+    var student_id = -1;
+
+    function generate()
+    {
+        student_id++;
+        return student_id;
+    }
+
+    return generate;
 }
 
 /**
