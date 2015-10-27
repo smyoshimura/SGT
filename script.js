@@ -14,6 +14,23 @@ var student_array = [];
 // The Ids will be defined in the reset() function.
 var inputIds = [];
 /**
+ * error_message - global object to hold error messages to be added to
+ *  the DOM in case invalid data is entered when trying to add a new
+ *  student
+ * @type {{studentName: string, course: string, studentGrade: string}}
+ */
+var error_messages = [
+    "Please enter a name for your new student.",
+    "Please enter a course for your new student.",
+    "Please enter a value between 0 and 100.",
+    "error-message"
+];
+var INVALID_NAME = 0;
+var INVALID_COURSE = 1;
+var INVALID_GRADE = 2;
+var ERROR_MESSAGE_CLASS_NAME = 3;
+
+/**
  * addClicked - Event Handler when user clicks the add button
  */
 function addClicked() {
@@ -33,6 +50,7 @@ function cancelClicked() {
  */
 function addStudent() {
     console.log('test');
+    removeErrorMessagesFromDom();
     var studentObject = {};
 
 
@@ -42,12 +60,87 @@ function addStudent() {
         studentObject[id_temp] = value;
         console.log(studentObject);
     }
-    studentObject.student_id = id_counter;
+    if (checkForErrorsInForm(studentObject) == true)
+        return;
 
-    id_counter++;
+    studentObject.student_id = id_counter++;
 
     student_array.push(studentObject);
 }
+
+/**
+ * checkForErrorsInForm - checks for any bad entries before adding a student,
+ *  and adds any possible error messages to the DOM
+ * @param studentObject
+ * @returns {boolean}
+ */
+function checkForErrorsInForm(studentObject)
+{
+    var do_errors_exist = false;
+    for (var data in studentObject)
+    {
+        // Check for bad student name
+        if (data == inputIds[0])
+        {
+            if (studentObject[data].length == 0)
+            {
+                addErrorMessageToDom(INVALID_NAME);
+                do_errors_exist = true;
+            }
+        }
+
+        // Check for bad course
+        if (data == inputIds[1])
+        {
+            if (studentObject[data].length == 0)
+            {
+                addErrorMessageToDom(INVALID_COURSE);
+                do_errors_exist = true;
+            }
+        }
+
+        // Check for bad grade
+        if (data == inputIds[2])
+        {
+            if (studentObject[data] < 0 || studentObject[data] > 100)
+            {
+                addErrorMessageToDom(INVALID_GRADE);
+                do_errors_exist = true;
+            }
+        }
+    }
+    return do_errors_exist;
+}
+
+/**
+ * addErrorMessageToDom - adds an error message just below the text
+ *  input that has the bad data
+ * @param errorIndex
+ */
+function addErrorMessageToDom(errorIndex)
+{
+    var $target_div = $('#' + inputIds[errorIndex]).parent();
+    var $error_message = $('<p>').text(error_messages[errorIndex]);
+    $error_message.addClass(error_messages[ERROR_MESSAGE_CLASS_NAME]);
+    $error_message.css(
+        {
+            color: 'red',
+            margin: 'auto auto 0 1vw'
+        });
+    $target_div.append($error_message);
+}
+/**
+ * removeErrorMessagesFromDom - removes any possibly existing error
+ *  messages on the page
+ */
+function removeErrorMessagesFromDom()
+{
+    var to_remove = $('.' + error_messages[ERROR_MESSAGE_CLASS_NAME]);
+    for (var i = 0; i < to_remove.length; i++)
+        $(to_remove[i]).remove();
+}
+
+
 /**
  * clearAddStudentForm - clears out the form values based on inputIds variable
  *///Ryan
@@ -117,7 +210,7 @@ function addStudentToDom(studentObj) {
     $new_student.attr("student_id", temp_obj_id);
 
     $student_table.append($new_student);
-
+    clearAddStudentForm();
     removeUnavailableLabelFromDom();
 }
 
