@@ -245,7 +245,7 @@ function addStudentToDom(studentObj) {
 function deleteStudent(student_elem){
     removeStudentFromDom(student_elem);
     removeStudentFromArray(student_elem);
-    updateData();
+    $('.avgGrade').text(calculateAverage());
 }
 
 /**
