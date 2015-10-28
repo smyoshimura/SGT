@@ -219,12 +219,21 @@ function addStudentToDom(studentObj) {
     {
         $new_student.append($('<td>').text(studentObj[inputIds[i]]));
     }
-    $new_student.append($('<td>').append($('<button>',
+
+    // Event delegation for any future delete buttons being added
+    $new_student.on('click', 'button.delete-student', function()
+    {
+       deleteStudent(studentObj.dom_elem);
+    });
+
+    var delete_button = $('<button>',
         {
             type: 'button',
-            class: 'btn btn-danger btn-xs delete-student',
-            onclick: 'deleteStudent(this.parentElement.parentElement)'
-        }).text('Delete')));
+            class: 'btn btn-danger btn-xs delete-student'
+        }).text('Delete');
+
+    $new_student.append($('<td>').append(delete_button));
+
     //adds unique id for deleting specific student object from array
     var temp_obj_id = studentObj.student_id;
     $new_student.attr("student_id", temp_obj_id);
