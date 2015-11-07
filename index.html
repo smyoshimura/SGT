@@ -25,7 +25,7 @@
             <span class="input-group-addon">
                 <span class="glyphicon glyphicon-user"></span>
             </span>
-            <input type="text" class="form-control" name="studentName" id="studentName" placeholder="Student Name">
+            <input type="text" class="form-control" name="studentName" id="name" placeholder="Student Name">
         </div>
         <div class="input-group form-group">
             <span class="input-group-addon">
@@ -38,11 +38,12 @@
             <span class="input-group-addon">
                 <span class="glyphicon glyphicon-education"></span>
             </span>
-            <input type="number" class="form-control" name="studentGrade" id="studentGrade"
+            <input type="number" class="form-control" name="studentGrade" id="grade"
                    placeholder="Student Grade">
         </div>
         <button type="button" class="btn btn-success" onclick="addClicked()">Add</button>
         <button type="button" class="btn btn-default" onclick="cancelClicked()">Cancel</button>
+        <button type="button" class="btn btn-info" onclick="dbClicked()">Populate From DB</button>
     </div>
     <div class="student-list-container col-sm-8 col-sm-pull-4">
         <table class="student-list table table-condensed">

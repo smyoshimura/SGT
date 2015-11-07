@@ -37,6 +37,14 @@ function addClicked() {
     if (addStudent())
         updateData();
 }
+
+/**
+ * dbClicked - Event Handler when user clicks the add button
+ */
+function dbClicked() {
+    getStudentDB();
+}
+
 /**
  * cancelClicked - Event Handler when user clicks the cancel button, should clear out student form
  */
@@ -49,7 +57,6 @@ function cancelClicked() {
  * @return boolean
  */
 function addStudent() {
-    console.log('test');
     removeErrorMessagesFromDom();
     var studentObject = {};
 
@@ -66,6 +73,27 @@ function addStudent() {
 
     student_array.push(studentObject);
     return true;
+}
+
+/** getStudentDB - request student data from database and store in variable
+ */
+
+function getStudentDB() {
+    $.ajax({
+        dataType: 'json',
+        method: 'POST',
+        url: 'http://s-apis.learningfuze.com/sgt/get',
+        data: {api_key: 'amZ9Q5UEUU'},
+        success: function (result) {
+            console.log(result);
+            for (var x in result.data) {
+                result.data[x].student_id = id_counter();
+                student_array.push(result.data[x]);
+                updateData();
+            }
+            console.log(student_array);
+        }
+    })
 }
 
 /**
@@ -174,7 +202,7 @@ function calculateAverage() {
     var total_grades = 0;
     var total_students = 0;
     for (i in student_array) {
-        total_grades = total_grades + parseInt(student_array[i].studentGrade);
+        total_grades = total_grades + parseInt(student_array[i].grade);
         ++total_students;
     }
     var average = Math.round(total_grades/total_students);
@@ -196,7 +224,6 @@ function updateData() {
  * updateStudentList - loops through global student array and appends each objects data into the student-list-container > list-body
  *///Stefanie
 function updateStudentList() {
-
     addStudentToDom(student_array[student_array.length - 1]);
 }
 /**
