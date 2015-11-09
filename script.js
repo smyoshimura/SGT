@@ -39,7 +39,7 @@ function addClicked() {
 }
 
 /**
- * dbClicked - Event Handler when user clicks the add button
+ * dbClicked - Event Handler when user clicks the populate from DB button
  */
 function dbClicked() {
     getStudentDB();
@@ -75,7 +75,7 @@ function addStudent() {
     return true;
 }
 
-/** getStudentDB - request student data from database and store in variable
+/** getStudentDB - request student data from database, store in student_array, and update the average and DOM
  */
 
 function getStudentDB() {
