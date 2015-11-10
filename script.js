@@ -71,8 +71,31 @@ function addStudent() {
 
     studentObject.student_id = id_counter();
 
+    addStudentToDB(studentObject);
+
     student_array.push(studentObject);
     return true;
+}
+
+/**
+ * addStudentToDB - pushes student object to DB when added via input fields
+ */
+
+function addStudentToDB(studentObject) {
+    $.ajax({
+        method: 'POST',
+        url: 'http://s-apis.learningfuze.com/sgt/create',
+        data: {
+            api_key: 'amZ9Q5UEUU',
+            name: studentObject.name,
+            course: studentObject.course,
+            grade: studentObject.grade
+        },
+        success: function (result) {
+            console.log(result);
+
+        }
+    })
 }
 
 /** getStudentDB - request student data from database and store in variable
@@ -80,6 +103,7 @@ function addStudent() {
 
 function getStudentDB() {
     $.ajax({
+
         dataType: 'json',
         method: 'POST',
         url: 'http://s-apis.learningfuze.com/sgt/get',
@@ -100,12 +124,10 @@ function getStudentDB() {
  * generateStudentId - Closure function for generating student ID
  * @returns {generate}
  */
-function generateStudentId()
-{
+function generateStudentId() {
     var student_id = 0;
 
-    return function()
-    {
+    return function () {
         return student_id++;
     };
 }
@@ -116,36 +138,28 @@ function generateStudentId()
  * @param studentObject
  * @returns {boolean}
  */
-function checkForErrorsInForm(studentObject)
-{
+function checkForErrorsInForm(studentObject) {
     var do_errors_exist = false;
-    for (var data in studentObject)
-    {
+    for (var data in studentObject) {
         // Check for bad student name
-        if (data == inputIds[0])
-        {
-            if (studentObject[data].length == 0)
-            {
+        if (data == inputIds[0]) {
+            if (studentObject[data].length == 0) {
                 addErrorMessageToDom(INVALID_NAME);
                 do_errors_exist = true;
             }
         }
 
         // Check for bad course
-        if (data == inputIds[1])
-        {
-            if (studentObject[data].length == 0)
-            {
+        if (data == inputIds[1]) {
+            if (studentObject[data].length == 0) {
                 addErrorMessageToDom(INVALID_COURSE);
                 do_errors_exist = true;
             }
         }
 
         // Check for bad grade
-        if (data == inputIds[2])
-        {
-            if (studentObject[data] < 0 || studentObject[data] > 100)
-            {
+        if (data == inputIds[2]) {
+            if (studentObject[data] < 0 || studentObject[data] > 100) {
                 addErrorMessageToDom(INVALID_GRADE);
                 do_errors_exist = true;
             }
@@ -159,8 +173,7 @@ function checkForErrorsInForm(studentObject)
  *  input that has the bad data
  * @param errorIndex
  */
-function addErrorMessageToDom(errorIndex)
-{
+function addErrorMessageToDom(errorIndex) {
     var $target_div = $('#' + inputIds[errorIndex]).parent();
     var $error_message = $('<p>').text(error_messages[errorIndex]);
     $error_message.addClass(error_messages[ERROR_MESSAGE_CLASS_NAME]);
@@ -175,8 +188,7 @@ function addErrorMessageToDom(errorIndex)
  * removeErrorMessagesFromDom - removes any possibly existing error
  *  messages on the page
  */
-function removeErrorMessagesFromDom()
-{
+function removeErrorMessagesFromDom() {
     var to_remove = $('.' + error_messages[ERROR_MESSAGE_CLASS_NAME]);
     for (var i = 0; i < to_remove.length; i++)
         $(to_remove[i]).remove();
@@ -189,8 +201,7 @@ function removeErrorMessagesFromDom()
 function clearAddStudentForm() {
     // Loop through the text inputs in the form,
     // and set their values to a blank string.
-    for (var i in inputIds)
-    {
+    for (var i in inputIds) {
         $('#' + inputIds[i]).val('');
     }
 }
@@ -205,7 +216,7 @@ function calculateAverage() {
         total_grades = total_grades + parseInt(student_array[i].grade);
         ++total_students;
     }
-    var average = Math.round(total_grades/total_students);
+    var average = Math.round(total_grades / total_students);
 
     if (isNaN(average)) {
         average = 0;
@@ -242,15 +253,13 @@ function addStudentToDom(studentObj) {
         });
     studentObj.dom_elem = $($new_student);
 
-    for (var i in inputIds)
-    {
+    for (var i in inputIds) {
         $new_student.append($('<td>').text(studentObj[inputIds[i]]));
     }
 
     // Event delegation for any future delete buttons being added
-    $new_student.on('click', 'button.delete-student', function()
-    {
-       deleteStudent(studentObj.dom_elem);
+    $new_student.on('click', 'button.delete-student', function () {
+        deleteStudent(studentObj.dom_elem, studentObj.id);
     });
 
     var delete_button = $('<button>',
@@ -275,10 +284,28 @@ function addStudentToDom(studentObj) {
  * deleteStudent - calls functions for removing student from DOM and student_array
  */
 //Stefanie
-function deleteStudent(student_elem){
-    removeStudentFromDom(student_elem);
-    removeStudentFromArray(student_elem);
+function deleteStudent(student_elem, student_id) {
+    removeStudentFromDom(student_elem, student_id);
+    removeStudentFromArray(student_elem, student_id);
+    removeStudentFromDB(student_elem, student_id);
     $('.avgGrade').text(calculateAverage());
+}
+
+/**
+ * removeStudentFromDB - deletes appropriate student from DB
+ */
+
+function removeStudentFromDB(student_elem, student_id) {
+    $.ajax({
+        dataType: 'json',
+        method: 'POST',
+
+        url: 'http://s-apis.learningfuze.com/sgt/delete',
+        data: {api_key: 'amZ9Q5UEUU', student_id: student_id},
+        success: function (result) {
+            console.log(result);
+        }
+    })
 }
 
 /**
@@ -288,8 +315,7 @@ function deleteStudent(student_elem){
  * @param student_elem - The top DOM container for the student to be removed.
  */
 //Ryan
-function removeStudentFromDom(student_elem)
-{
+function removeStudentFromDom(student_elem) {
     student_elem.remove(0);
 
     remaining_student_rows = $('.student-row');
@@ -298,9 +324,9 @@ function removeStudentFromDom(student_elem)
 }
 
 /**
-* STUDENT-MADE FUNCTION
-* removeStudentFromArray - removes relevant student object from array according to student_id
-*/
+ * STUDENT-MADE FUNCTION
+ * removeStudentFromArray - removes relevant student object from array according to student_id
+ */
 //Stefanie
 function removeStudentFromArray(student_elem) {
     var removal_id = $(student_elem).attr("student_id");
@@ -312,8 +338,7 @@ function removeStudentFromArray(student_elem) {
  * STUDENT-MADE FUNCTION
  * addUnavailableLabelToDom - Adds the "User Info Unavailable" label to the DOM.
  */
-function addUnavailableLabelToDom()
-{
+function addUnavailableLabelToDom() {
     // Only add if it's not already in the DOM
     var label = document.getElementById('unavailable');
     if (label == null)
@@ -324,8 +349,7 @@ function addUnavailableLabelToDom()
  * STUDENT-MADE FUNCTION
  * removeUnavailableLabelFromDom - Removes the "User Info Unavailable" label from the DOM
  */
-function removeUnavailableLabelFromDom()
-{
+function removeUnavailableLabelFromDom() {
     var label = document.getElementById('unavailable');
     if (label != null)
         label.remove();
@@ -351,22 +375,31 @@ function reset() {
     for (var i = 0; i < $input_elems.length; i++)
         inputIds.push($input_elems[i].getAttribute('id'));
 }
+/**
+ * Waiting for AJAX load spinner
+ */
+var $body;
+
+$(document).on({
+    ajaxStart: function () {
+        console.log('ajaxstart');
+        $body.addClass("loading");
+    },
+    ajaxStop: function () {
+        console.log('ajaxstop');
+        $body.removeClass("loading");
+    }
+});
 
 /**
  * Listen for the document to load and reset the data to the initial state
  */
 
-document.addEventListener("DOMContentLoaded", function(event)
-{
+
+document.addEventListener("DOMContentLoaded", function (event) {
+    $body = $('body');
     reset();
 
-    /*TEST CODE
-     var student =
-     {
-     studentName: 'Amanda Huggenkis',
-     course: 'pranking',
-     studentGrade: '97'
-     };
-     addStudentToDom(student);
-     TEST CODE*/
+    dbClicked();
 });
+
