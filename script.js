@@ -1,18 +1,22 @@
 /**
  * Define all global variables here
  */
+    //variable for calling the id counter
 var id_counter = generateStudentId();
+
 /**
  * student_array - global array to hold student objects
  * @type {Array}
  */
 var student_array = [];
+
 /**
  * inputIds - id's of the elements that are used to add students
  * @type {string[]}
  */
 // The Ids will be defined in the reset() function.
 var inputIds = [];
+
 /**
  * error_message - global object to hold error messages to be added to
  *  the DOM in case invalid data is entered when trying to add a new
@@ -25,6 +29,7 @@ var error_messages = [
     "Please enter a value between 0 and 100.",
     "error-message"
 ];
+
 var INVALID_NAME = 0;
 var INVALID_COURSE = 1;
 var INVALID_GRADE = 2;
@@ -51,6 +56,7 @@ function dbClicked() {
 function cancelClicked() {
     clearAddStudentForm();
 }
+
 /**
  * addStudent - creates a student objects based on input fields in the form and adds the object to global student array
  *
@@ -80,7 +86,6 @@ function addStudent() {
 /**
  * addStudentToDB - pushes student object to DB when added via input fields
  */
-
 function addStudentToDB(studentObject) {
     $.ajax({
         method: 'POST',
@@ -93,17 +98,14 @@ function addStudentToDB(studentObject) {
         },
         success: function (result) {
             console.log(result);
-
         }
     })
 }
 
-/** getStudentDB - request student data from database and store in variable
+/** getStudentDB - request student data from database, add to student_array, and update table and average
  */
-
 function getStudentDB() {
     $.ajax({
-
         dataType: 'json',
         method: 'POST',
         url: 'http://s-apis.learningfuze.com/sgt/get',
@@ -184,6 +186,7 @@ function addErrorMessageToDom(errorIndex) {
         });
     $target_div.append($error_message);
 }
+
 /**
  * removeErrorMessagesFromDom - removes any possibly existing error
  *  messages on the page
@@ -193,7 +196,6 @@ function removeErrorMessagesFromDom() {
     for (var i = 0; i < to_remove.length; i++)
         $(to_remove[i]).remove();
 }
-
 
 /**
  * clearAddStudentForm - clears out the form values based on inputIds variable
@@ -205,6 +207,7 @@ function clearAddStudentForm() {
         $('#' + inputIds[i]).val('');
     }
 }
+
 /**
  * calculateAverage - loop through the global student array and calculate average grade and return that value
  * @returns {number}
@@ -221,9 +224,9 @@ function calculateAverage() {
     if (isNaN(average)) {
         average = 0;
     }
-
     return average;
 }
+
 /**
  * updateData - centralized function to update the average and call student list update
  *///Ryan
@@ -231,12 +234,14 @@ function updateData() {
     $('.avgGrade').text(calculateAverage());
     updateStudentList();
 }
+
 /**
- * updateStudentList - loops through global student array and appends each objects data into the student-list-container > list-body
+ * updateStudentList - adds once student from the array to the dom, is called multiple times when adding multiple students at once
  *///Stefanie
 function updateStudentList() {
     addStudentToDom(student_array[student_array.length - 1]);
 }
+
 /**
  * addStudentToDom - take in a student object, create html elements from the values and then append the elements
  * into the .student_list body
@@ -294,12 +299,10 @@ function deleteStudent(student_elem, student_id) {
 /**
  * removeStudentFromDB - deletes appropriate student from DB
  */
-
 function removeStudentFromDB(student_elem, student_id) {
     $.ajax({
         dataType: 'json',
         method: 'POST',
-
         url: 'http://s-apis.learningfuze.com/sgt/delete',
         data: {api_key: 'amZ9Q5UEUU', student_id: student_id},
         success: function (result) {
@@ -354,6 +357,7 @@ function removeUnavailableLabelFromDom() {
     if (label != null)
         label.remove();
 }
+
 /**
  * reset - resets the application to initial state. Global variables reset, DOM get reset to initial load state
  *///Ryan
@@ -364,19 +368,18 @@ function reset() {
     for (var i = 0; i < $delete_buttons.length; i++)
         removeStudentFromDom($delete_buttons[i]);
 
-
     // Reset all global variables
     student_array = [];
     inputIds = [];
-
 
     // Set the inputIds array elements
     var $input_elems = $('.input-group>input[type=\"text\"], .input-group>input[type=\"number\"]');
     for (var i = 0; i < $input_elems.length; i++)
         inputIds.push($input_elems[i].getAttribute('id'));
 }
+
 /**
- * Waiting for AJAX load spinner
+ * Bring up loading spinner when waiting for AJAX calls
  */
 var $body;
 
@@ -392,14 +395,11 @@ $(document).on({
 });
 
 /**
- * Listen for the document to load and reset the data to the initial state
+ * Listen for the document to load and reset the data to the initial state and populate the table from the database
  */
-
-
 document.addEventListener("DOMContentLoaded", function (event) {
     $body = $('body');
     reset();
 
     dbClicked();
 });
-
