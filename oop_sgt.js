@@ -50,12 +50,12 @@ function School() {
                 console.log('Ajax call result:', result);
 
                 for (var x in result.data) {
-                    var newStudent = Student();
-                    newStudent.student_id = id_counter();
-                    newStudent.name = result.data[x].name;
-                    newStudent.course = result.data[x].course;
-                    newStudent.grade = result.data[x].grade;
-                    firstSchool.student_array.push(newStudent);
+                    var dbStudent = new Student();
+                    dbStudent.student_id = id_counter();
+                    dbStudent.name = result.data[x].name;
+                    dbStudent.course = result.data[x].course;
+                    dbStudent.grade = result.data[x].grade;
+                    firstSchool.student_array.push(dbStudent);
                     updateData();
                 }
 
@@ -71,6 +71,7 @@ function School() {
             total_grades = total_grades + parseInt(firstSchool.student_array[i].grade);
             ++total_students;
         }
+
         var average = Math.round(total_grades / total_students);
 
         if (isNaN(average)) {
