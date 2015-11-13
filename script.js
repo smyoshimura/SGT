@@ -51,6 +51,7 @@ function dbClicked() {
 function cancelClicked() {
     clearAddStudentForm();
 }
+
 /**
  * addStudent - creates a student objects based on input fields in the form and adds the object to global student array
  *

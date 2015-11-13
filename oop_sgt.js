@@ -20,23 +20,20 @@ function School() {
     var id_counter = this.generateStudentId();
 
     this.addStudent = function () {
-        errorChecker.removeErrorMessagesFromDom();
+        //errorChecker.removeErrorMessagesFromDom();
 
-        var studentObject = {};
+        var newStudent = new Student();
 
-        for (var x in inputIds) {
-            var id_temp = inputIds[x];
-            var value = $('#' + id_temp).val();
-            studentObject[id_temp] = value;
-            console.log(studentObject);
-        }
+        newStudent.getFormInputs();
 
-        if (errorChecker.checkForErrorsInForm(studentObject) == true)
-            return false;
+        //if (errorChecker.checkForErrorsInForm(newStudent) == true)
+        //    return false;
 
-        studentObject.student_id = id_counter();
+        newStudent.student_id = id_counter();
 
-        student_array.push(studentObject);
+        this.student_array.push(newStudent);
+
+        console.log('Array after form add:', this.student_array);
 
         return true;
     };
@@ -47,14 +44,18 @@ function School() {
             method: 'POST',
             url: 'http://s-apis.learningfuze.com/sgt/get',
             data: {api_key: 'amZ9Q5UEUU'},
+
             success: function (result) {
-                console.log(result);
+
+                console.log('Ajax call result:', result);
+
                 for (var x in result.data) {
                     result.data[x].student_id = id_counter();
-                    student_array.push(result.data[x]);
+                    firstSchool.student_array.push(result.data[x]);
                     updateData();
                 }
-                console.log(student_array);
+
+                console.log('Array after call:', firstSchool.student_array);
             }
         })
     };
@@ -62,8 +63,8 @@ function School() {
     this.calculateAverage = function () {
         var total_grades = 0;
         var total_students = 0;
-        for (i in student_array) {
-            total_grades = total_grades + parseInt(student_array[i].grade);
+        for (i in firstSchool.student_array) {
+            total_grades = total_grades + parseInt(firstSchool.student_array[i].grade);
             ++total_students;
         }
         var average = Math.round(total_grades / total_students);
@@ -76,7 +77,7 @@ function School() {
     };
 
     this.updateStudentList = function () {
-        this.addStudentToDom(student_array[student_array.length - 1]);
+        this.addStudentToDom(firstSchool.student_array[firstSchool.student_array.length - 1]);
     };
 
     this.addStudentToDom = function (studentObj) {
@@ -90,8 +91,8 @@ function School() {
             });
         studentObj.dom_elem = $($new_student);
 
-        for (var i in inputIds) {
-            $new_student.append($('<td>').text(studentObj[inputIds[i]]));
+        for (var i in firstSchool.inputIds) {
+            $new_student.append($('<td>').text(studentObj[firstSchool.inputIds[i]]));
         }
 
         // Event delegation for any future delete buttons being added
@@ -122,7 +123,7 @@ function School() {
         $('.avgGrade').text(this.calculateAverage());
     };
 
-    this.removeStudentFromDom= function (student_elem) {
+    this.removeStudentFromDom = function (student_elem) {
         student_elem.remove(0);
 
         var remaining_student_rows = $('.student-row');
@@ -133,13 +134,24 @@ function School() {
     this.removeStudentFromArray = function (student_elem) {
         var removal_id = $(student_elem).attr("student_id");
 
-        delete student_array[removal_id];
+        delete this.student_array[removal_id];
     };
 }
 
 //Student
-function Student() {
+function Student(name, course, grade, student_id) {
+    this.name = name;
+    this.course = course;
+    this.grade = grade;
+    this.student_id = student_id;
 
+    this.getFormInputs = function () {
+        for (var x in firstSchool.inputIds) {
+            var id_temp = firstSchool.inputIds[x];
+            var value = $('#' + id_temp).val();
+            this[id_temp] = value;
+        }
+    };
 }
 
 //Errors
@@ -235,8 +247,8 @@ function cancelClicked() {
 function clearAddStudentForm() {
     // Loop through the text inputs in the form,
     // and set their values to a blank string.
-    for (var i in inputIds) {
-        $('#' + inputIds[i]).val('');
+    for (var i in firstSchool.inputIds) {
+        $('#' + firstSchool.inputIds[i]).val('');
     }
 }
 
@@ -256,16 +268,12 @@ function reset() {
     errorChecker.addUnavailableLabelToDom();
     var $delete_buttons = $('.delete-student');
     for (var i = 0; i < $delete_buttons.length; i++)
-        removeStudentFromDom($delete_buttons[i]);
-
-    // Reset all global variables
-    student_array = [];
-    inputIds = [];
+        firstSchool.removeStudentFromDom($delete_buttons[i]);
 
     // Set the inputIds array elements
     var $input_elems = $('.input-group>input[type=\"text\"], .input-group>input[type=\"number\"]');
     for (var i = 0; i < $input_elems.length; i++)
-        inputIds.push($input_elems[i].getAttribute('id'));
+        firstSchool.inputIds.push($input_elems[i].getAttribute('id'));
 }
 
 /**
