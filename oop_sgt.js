@@ -50,8 +50,12 @@ function School() {
                 console.log('Ajax call result:', result);
 
                 for (var x in result.data) {
-                    result.data[x].student_id = id_counter();
-                    firstSchool.student_array.push(result.data[x]);
+                    var newStudent = Student();
+                    newStudent.student_id = id_counter();
+                    newStudent.name = result.data[x].name;
+                    newStudent.course = result.data[x].course;
+                    newStudent.grade = result.data[x].grade;
+                    firstSchool.student_array.push(newStudent);
                     updateData();
                 }
 
