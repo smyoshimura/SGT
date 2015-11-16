@@ -4,7 +4,7 @@
 var firstSchool = new School();
 var errorChecker = new Errors();
 
-//School
+//School - holds most functions for managing students - adding/removing from dom and database
 function School() {
     this.student_array = [];
     this.inputIds = [];
@@ -55,6 +55,7 @@ function School() {
 
                 console.log('Ajax call result:', result);
 
+                //Converts each student from database into an instance of the Student class
                 for (var x in result.data) {
                     var dbStudent = new Student();
                     dbStudent.student_id = id_counter();
@@ -84,8 +85,12 @@ function School() {
                 course: studentObject.course,
                 grade: studentObject.grade
             },
+
             success: function (result) {
+
                 console.log(result);
+
+                //Grabs the new database id and add into the Student object
                 studentObject.db_id = result.new_id;
             }
         })
@@ -94,6 +99,7 @@ function School() {
     this.calculateAverage = function () {
         var total_grades = 0;
         var total_students = 0;
+
         for (var i in firstSchool.student_array) {
             total_grades = total_grades + parseInt(firstSchool.student_array[i].grade);
             ++total_students;
@@ -109,7 +115,9 @@ function School() {
     };
 
     this.updateStudentList = function () {
+
         this.addStudentToDom(firstSchool.student_array[firstSchool.student_array.length - 1]);
+
     };
 
     this.addStudentToDom = function (studentObj) {
@@ -171,6 +179,7 @@ function School() {
             method: 'POST',
             url: 'http://s-apis.learningfuze.com/sgt/delete',
             data: {api_key: 'amZ9Q5UEUU', student_id: student_id},
+
             success: function (result) {
                 console.log(result);
             }
@@ -185,12 +194,15 @@ function School() {
 
     this.checkForMaxGrade = function () {
         var maxGrade = null;
+
+        //Find highest possible grade among students
         for (var i in this.student_array) {
             if (maxGrade == null || maxGrade < this.student_array[i].grade) {
                 maxGrade = this.student_array[i].grade;
             }
         }
 
+        //Highlights all students with matching maximum grade
         for (i in this.student_array) {
             if (maxGrade == this.student_array[i].grade) {
                 $(this.student_array[i].dom_elem).addClass('success');
@@ -200,12 +212,15 @@ function School() {
 
     this.checkForMinGrade = function () {
         var minGrade = null;
+
+        //Find lowest possible grade among students
         for (var i in this.student_array) {
             if (minGrade == null || minGrade > this.student_array[i].grade) {
                 minGrade = this.student_array[i].grade;
             }
         }
 
+        //Highlights all students with matching minimum grade
         for (i in this.student_array) {
             if (minGrade == this.student_array[i].grade) {
                 $(this.student_array[i].dom_elem).addClass('danger');
@@ -214,7 +229,7 @@ function School() {
     };
 }
 
-//Student
+//Student - holds student info and grabs values from the form for filling properties
 function Student(name, course, grade, student_id, db_id) {
     this.name = name;
     this.course = course;
@@ -231,7 +246,7 @@ function Student(name, course, grade, student_id, db_id) {
     };
 }
 
-//Errors
+//Errors - holds error checking and tracking if info is listed in the dom
 function Errors() {
     this.error_messages = [
         "Please enter a name for your new student.",
@@ -295,7 +310,7 @@ function Errors() {
     }
 }
 
-//Misc Functions
+//Misc Functions - functions that don't currently fit into either the School or Student classes
 /**
  * addClicked - Event Handler when user clicks the add button
  */
@@ -334,6 +349,7 @@ function clearAddStudentForm() {
  *///Ryan
 function updateData() {
     $('.avgGrade').text(firstSchool.calculateAverage());
+
     firstSchool.checkForMaxGrade();
     firstSchool.checkForMinGrade();
 }
@@ -363,6 +379,7 @@ $(document).on({
         console.log('ajaxstart');
         $body.addClass("loading");
     },
+
     ajaxStop: function () {
         console.log('ajaxstop');
         $body.removeClass("loading");
