@@ -101,6 +101,9 @@ function School() {
         var total_students = 0;
 
         for (var i in firstSchool.student_array) {
+            if (firstSchool.student_array[i] === null) {
+                continue
+            }
             total_grades = total_grades + parseInt(firstSchool.student_array[i].grade);
             ++total_students;
         }
@@ -129,6 +132,11 @@ function School() {
             {
                 class: 'student-row'
             });
+
+        if (studentObj === null) {
+            return
+        }
+
         studentObj.dom_elem = $($new_student);
 
         for (var i in firstSchool.inputIds) {
@@ -161,6 +169,8 @@ function School() {
         this.removeStudentFromDom(student_elem);
         this.removeStudentFromArray(student_elem);
         this.removeStudentFromDB(student_id);
+
+        updateLocalStorage();
 
         $('.avgGrade').text(this.calculateAverage());
     };
@@ -197,6 +207,9 @@ function School() {
 
         //Find highest possible grade among students
         for (var i in this.student_array) {
+            if (this.student_array[i] === null) {
+                continue
+            }
             if (maxGrade == null || maxGrade < this.student_array[i].grade) {
                 maxGrade = this.student_array[i].grade;
             }
@@ -204,6 +217,9 @@ function School() {
 
         //Highlights all students with matching maximum grade
         for (i in this.student_array) {
+            if (this.student_array[i] === null) {
+                continue
+            }
             if (maxGrade == this.student_array[i].grade) {
                 $(this.student_array[i].dom_elem).addClass('success');
             }
@@ -215,6 +231,9 @@ function School() {
 
         //Find lowest possible grade among students
         for (var i in this.student_array) {
+            if (this.student_array[i] === null) {
+                continue
+            }
             if (minGrade == null || minGrade > this.student_array[i].grade) {
                 minGrade = this.student_array[i].grade;
             }
@@ -222,12 +241,15 @@ function School() {
 
         //Highlights all students with matching minimum grade
         for (i in this.student_array) {
+            if (this.student_array[i] === null) {
+                continue
+        }
             if (minGrade == this.student_array[i].grade) {
                 $(this.student_array[i].dom_elem).addClass('danger');
             }
         }
     };
-}
+};
 
 //Student - holds student info and grabs values from the form for filling properties
 function Student(name, course, grade, student_id, db_id) {
@@ -312,6 +334,28 @@ function Errors() {
 
 //Misc Functions - functions that don't currently fit into either the School or Student classes
 /**
+ * updateLocalStorage - copies student_array to localStorage
+ */
+function updateLocalStorage() {
+    localStorage.setItem('student_arry', '');
+
+    localStorage.setItem('student_array', JSON.stringify(firstSchool.student_array));
+}
+
+/**
+ * retrieveLocalStorage - retrieves data from localStorage and copies to student_array
+ */
+function retrieveLocalStorage() {
+    var tempStorage = localStorage.getItem('student_array');
+
+    firstSchool.student_array = JSON.parse(tempStorage);
+
+    for (var i in firstSchool.student_array) {
+        firstSchool.addStudentToDom(firstSchool.student_array[i]);
+    }
+}
+
+/**
  * addClicked - Event Handler when user clicks the add button
  */
 function addClicked() {
@@ -352,6 +396,8 @@ function updateData() {
 
     firstSchool.checkForMaxGrade();
     firstSchool.checkForMinGrade();
+
+    updateLocalStorage();
 }
 
 /**
@@ -394,5 +440,7 @@ document.addEventListener("DOMContentLoaded", function (event) {
 
     reset();
 
-    dbClicked();
+    retrieveLocalStorage();
+
+    updateData();
 });
