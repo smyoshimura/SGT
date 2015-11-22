@@ -6,10 +6,12 @@ var errorChecker = new Errors();
 
 //School - holds most functions for managing students - adding/removing from dom and database
 function School() {
-    this.student_array = [];
-    this.inputIds = [];
+    var self = this;
 
-    this.generateStudentId = function () {
+    self.student_array = [];
+    self.inputIds = [];
+
+    self.generateStudentId = function () {
         var student_id = 0;
 
         return function () {
@@ -17,12 +19,12 @@ function School() {
         };
     };
 
-    var id_counter = this.generateStudentId();
+    var id_counter = self.generateStudentId();
 
-    this.addStudent = function () {
+    self.addStudent = function () {
         //errorChecker.removeErrorMessagesFromDom();
 
-        var newStudent = new Student();
+        var newStudent = new Student(self);
 
         newStudent.getFormInputs();
 
@@ -31,20 +33,20 @@ function School() {
 
         newStudent.student_id = id_counter();
 
-        this.addStudentToDB(newStudent);
+        self.addStudentToDB(newStudent);
 
-        this.student_array.push(newStudent);
+        self.student_array.push(newStudent);
 
-        this.updateStudentList();
+        self.updateStudentList();
 
-        updateData();
+        updateData(self);
 
-        console.log('Array after form add:', this.student_array);
+        console.log('Array after form add:', self.student_array);
 
         return true;
     };
 
-    this.getStudentDB = function () {
+    self.getStudentDB = function () {
         $.ajax({
             dataType: 'json',
             method: 'POST',
@@ -57,24 +59,24 @@ function School() {
 
                 //Converts each student from database into an instance of the Student class
                 for (var x in result.data) {
-                    var dbStudent = new Student();
+                    var dbStudent = new Student(self);
                     dbStudent.student_id = id_counter();
                     dbStudent.name = result.data[x].name;
                     dbStudent.course = result.data[x].course;
                     dbStudent.grade = result.data[x].grade;
                     dbStudent.db_id = result.data[x].id;
-                    firstSchool.student_array.push(dbStudent);
-                    firstSchool.updateStudentList();
+                    self.student_array.push(dbStudent);
+                    self.updateStudentList();
                 }
 
-                updateData();
+                updateData(self);
 
-                console.log('Array after call:', firstSchool.student_array);
+                console.log('Array after call:', self.student_array);
             }
         })
     };
 
-    this.addStudentToDB = function (studentObject) {
+    self.addStudentToDB = function (studentObject) {
         $.ajax({
             dataType: 'json',
             method: 'POST',
@@ -96,15 +98,15 @@ function School() {
         })
     };
 
-    this.calculateAverage = function () {
+    self.calculateAverage = function () {
         var total_grades = 0;
         var total_students = 0;
 
-        for (var i in firstSchool.student_array) {
-            if (firstSchool.student_array[i] === null) {
+        for (var i in self.student_array) {
+            if (self.student_array[i] === null) {
                 continue
             }
-            total_grades = total_grades + parseInt(firstSchool.student_array[i].grade);
+            total_grades = total_grades + parseInt(self.student_array[i].grade);
             ++total_students;
         }
 
@@ -117,13 +119,13 @@ function School() {
         return average;
     };
 
-    this.updateStudentList = function () {
+    self.updateStudentList = function () {
 
-        this.addStudentToDom(firstSchool.student_array[firstSchool.student_array.length - 1]);
+        self.addStudentToDom(self.student_array[self.student_array.length - 1]);
 
     };
 
-    this.addStudentToDom = function (studentObj) {
+    self.addStudentToDom = function (studentObj) {
         // This is the place where we will append the new student DOM object to
         var $student_table = $('.student-list>tbody');
 
@@ -139,13 +141,13 @@ function School() {
 
         studentObj.dom_elem = $($new_student);
 
-        for (var i in firstSchool.inputIds) {
-            $new_student.append($('<td>').text(studentObj[firstSchool.inputIds[i]]));
+        for (var i in self.inputIds) {
+            $new_student.append($('<td>').text(studentObj[self.inputIds[i]]));
         }
 
         // Event delegation for any future delete buttons being added
         $new_student.on('click', 'button.delete-student', function () {
-            firstSchool.deleteStudent(studentObj.dom_elem, studentObj.db_id);
+            self.deleteStudent(studentObj.dom_elem, studentObj.db_id);
         });
 
         var delete_button = $('<button>',
@@ -161,21 +163,21 @@ function School() {
         $new_student.attr("student_id", temp_obj_id);
 
         $student_table.append($new_student);
-        clearAddStudentForm();
+        clearAddStudentForm(self);
         errorChecker.removeUnavailableLabelFromDom();
     };
 
-    this.deleteStudent = function (student_elem, student_id) {
-        this.removeStudentFromDom(student_elem);
-        this.removeStudentFromArray(student_elem);
-        this.removeStudentFromDB(student_id);
+    self.deleteStudent = function (student_elem, student_id) {
+        self.removeStudentFromDom(student_elem);
+        self.removeStudentFromArray(student_elem);
+        self.removeStudentFromDB(student_id);
 
-        updateLocalStorage();
+        updateLocalStorage(self);
 
-        $('.avgGrade').text(this.calculateAverage());
+        $('.avgGrade').text(self.calculateAverage());
     };
 
-    this.removeStudentFromDom = function (student_elem) {
+    self.removeStudentFromDom = function (student_elem) {
         student_elem.remove();
 
         var remaining_student_rows = $('.student-row');
@@ -183,7 +185,7 @@ function School() {
             errorChecker.addUnavailableLabelToDom();
     };
 
-    this.removeStudentFromDB = function (student_id) {
+    self.removeStudentFromDB = function (student_id) {
         $.ajax({
             dataType: 'json',
             method: 'POST',
@@ -196,80 +198,84 @@ function School() {
         })
     };
 
-    this.removeStudentFromArray = function (student_elem) {
+    self.removeStudentFromArray = function (student_elem) {
         var removal_id = $(student_elem).attr("student_id");
 
-        delete this.student_array[removal_id];
+        delete self.student_array[removal_id];
     };
 
-    this.checkForMaxGrade = function () {
+    self.checkForMaxGrade = function () {
         var maxGrade = null;
 
         //Find highest possible grade among students
-        for (var i in this.student_array) {
-            if (this.student_array[i] === null) {
+        for (var i in self.student_array) {
+            if (self.student_array[i] === null) {
                 continue
             }
-            if (maxGrade == null || maxGrade < this.student_array[i].grade) {
-                maxGrade = this.student_array[i].grade;
+            if (maxGrade == null || maxGrade < self.student_array[i].grade) {
+                maxGrade = self.student_array[i].grade;
             }
         }
 
         //Highlights all students with matching maximum grade
-        for (i in this.student_array) {
-            if (this.student_array[i] === null) {
+        for (i in self.student_array) {
+            if (self.student_array[i] === null) {
                 continue
             }
-            if (maxGrade == this.student_array[i].grade) {
-                $(this.student_array[i].dom_elem).addClass('success');
+            if (maxGrade == self.student_array[i].grade) {
+                $(self.student_array[i].dom_elem).addClass('success');
             }
         }
     };
 
-    this.checkForMinGrade = function () {
+    self.checkForMinGrade = function () {
         var minGrade = null;
 
         //Find lowest possible grade among students
-        for (var i in this.student_array) {
-            if (this.student_array[i] === null) {
+        for (var i in self.student_array) {
+            if (self.student_array[i] === null) {
                 continue
             }
-            if (minGrade == null || minGrade > this.student_array[i].grade) {
-                minGrade = this.student_array[i].grade;
+            if (minGrade == null || minGrade > self.student_array[i].grade) {
+                minGrade = self.student_array[i].grade;
             }
         }
 
         //Highlights all students with matching minimum grade
-        for (i in this.student_array) {
-            if (this.student_array[i] === null) {
+        for (i in self.student_array) {
+            if (self.student_array[i] === null) {
                 continue
         }
-            if (minGrade == this.student_array[i].grade) {
-                $(this.student_array[i].dom_elem).addClass('danger');
+            if (minGrade == self.student_array[i].grade) {
+                $(self.student_array[i].dom_elem).addClass('danger');
             }
         }
     };
 };
 
 //Student - holds student info and grabs values from the form for filling properties
-function Student(name, course, grade, student_id, db_id) {
-    this.name = name;
-    this.course = course;
-    this.grade = grade;
-    this.student_id = student_id;
-    this.db_id = db_id;
+function Student(school) {
+    var self = this;
 
-    this.getFormInputs = function () {
-        for (var x in firstSchool.inputIds) {
-            var id_temp = firstSchool.inputIds[x];
+    self.name = name;
+    self.course = course;
+    self.grade = grade;
+    self.student_id = student_id;
+    self.db_id = db_id;
+
+    self.getFormInputs = function () {
+        for (var x in school.inputIds) {
+            var id_temp = school.inputIds[x];
             var value = $('#' + id_temp).val();
-            this[id_temp] = value;
+            self[id_temp] = value;
         }
     };
 }
 
 //Errors - holds error checking and tracking if info is listed in the dom
 function Errors() {
+    var self = this;
+
     this.error_messages = [
         "Please enter a name for your new student.",
         "Please enter a course for your new student.",
@@ -277,31 +283,31 @@ function Errors() {
         "error-message"
     ];
 
-    this.INVALID_NAME = 0;
-    this.INVALID_COURSE = 1;
-    this.INVALID_GRADE = 2;
-    this.ERROR_MESSAGE_CLASS_NAME = 3;
+    self.INVALID_NAME = 0;
+    self.INVALID_COURSE = 1;
+    self.INVALID_GRADE = 2;
+    self.ERROR_MESSAGE_CLASS_NAME = 3;
 
-    this.removeErrorMessagesFromDom = function () {
-        var to_remove = $('.' + this.error_messages[this.ERROR_MESSAGE_CLASS_NAME]);
+    self.removeErrorMessagesFromDom = function () {
+        var to_remove = $('.' + self.error_messages[self.ERROR_MESSAGE_CLASS_NAME]);
         for (var i = 0; i < to_remove.length; i++)
             $(to_remove[i]).remove();
     };
 
-    this.addUnavailableLabelToDom = function () {
+    self.addUnavailableLabelToDom = function () {
         // Only add if it's not already in the DOM
         var label = document.getElementById('unavailable');
         if (label == null)
             $('div.student-list-container').append($('<h3>', {id: 'unavailable'}).append($('<b>').text('User Info Unavailable')));
     };
 
-    this.removeUnavailableLabelFromDom = function () {
+    self.removeUnavailableLabelFromDom = function () {
         var label = document.getElementById('unavailable');
         if (label != null)
             label.remove();
     };
 
-    this.checkForErrorsInForm = function (studentObject) {
+    self.checkForErrorsInForm = function (studentObject) {
         var do_errors_exist = false;
         for (var data in studentObject) {
             // Check for bad student name
@@ -336,84 +342,84 @@ function Errors() {
 /**
  * updateLocalStorage - copies student_array to localStorage
  */
-function updateLocalStorage() {
+function updateLocalStorage(school) {
     localStorage.setItem('student_arry', '');
 
-    localStorage.setItem('student_array', JSON.stringify(firstSchool.student_array));
+    localStorage.setItem('student_array', JSON.stringify(school.student_array));
 }
 
 /**
  * retrieveLocalStorage - retrieves data from localStorage and copies to student_array
  */
-function retrieveLocalStorage() {
+function retrieveLocalStorage(school) {
     var tempStorage = localStorage.getItem('student_array');
 
-    firstSchool.student_array = JSON.parse(tempStorage);
+    school.student_array = JSON.parse(tempStorage);
 
-    for (var i in firstSchool.student_array) {
-        firstSchool.addStudentToDom(firstSchool.student_array[i]);
+    for (var i in school.student_array) {
+        school.addStudentToDom(school.student_array[i]);
     }
 }
 
 /**
  * addClicked - Event Handler when user clicks the add button
  */
-function addClicked() {
-    if (firstSchool.addStudent())
-        updateData();
+function addClicked(school) {
+    if (school.addStudent())
+        updateData(school);
 }
 
 /**
  * dbClicked - Event Handler when user clicks the populate from DB button
  */
-function dbClicked() {
-    firstSchool.getStudentDB();
+function dbClicked(school) {
+    school.getStudentDB();
 }
 
 /**
  * cancelClicked - Event Handler when user clicks the cancel button, should clear out student form
  */
-function cancelClicked() {
-    clearAddStudentForm();
+function cancelClicked(school) {
+    clearAddStudentForm(school);
 }
 
 /**
  * clearAddStudentForm - clears out the form values based on inputIds variable
  *///Ryan
-function clearAddStudentForm() {
+function clearAddStudentForm(school) {
     // Loop through the text inputs in the form,
     // and set their values to a blank string.
-    for (var i in firstSchool.inputIds) {
-        $('#' + firstSchool.inputIds[i]).val('');
+    for (var i in school.inputIds) {
+        $('#' + school.inputIds[i]).val('');
     }
 }
 
 /**
  * updateData - centralized function to update the average and call student list update
  *///Ryan
-function updateData() {
-    $('.avgGrade').text(firstSchool.calculateAverage());
+function updateData(school) {
+    $('.avgGrade').text(school.calculateAverage());
 
-    firstSchool.checkForMaxGrade();
-    firstSchool.checkForMinGrade();
+    school.checkForMaxGrade();
+    school.checkForMinGrade();
 
-    updateLocalStorage();
+    updateLocalStorage(school);
 }
 
 /**
  * reset - resets the application to initial state. Global variables reset, DOM get reset to initial load state
  *///Ryan
-function reset() {
+function reset(school) {
     // Empty out the table elements in the DOM
     errorChecker.addUnavailableLabelToDom();
     var $delete_buttons = $('.delete-student');
     for (var i = 0; i < $delete_buttons.length; i++)
-        firstSchool.removeStudentFromDom($delete_buttons[i]);
+        school.removeStudentFromDom($delete_buttons[i]);
 
     // Set the inputIds array elements
     var $input_elems = $('.input-group>input[type=\"text\"], .input-group>input[type=\"number\"]');
     for (var i = 0; i < $input_elems.length; i++)
-        firstSchool.inputIds.push($input_elems[i].getAttribute('id'));
+        school.inputIds.push($input_elems[i].getAttribute('id'));
 }
 /**
  * Bring up loading spinner when waiting for AJAX calls
@@ -438,9 +444,9 @@ $(document).on({
 document.addEventListener("DOMContentLoaded", function (event) {
     $body = $('body');
 
-    reset();
+    reset(firstSchool);
 
-    retrieveLocalStorage();
+    retrieveLocalStorage(firstSchool);
 
-    updateData();
+    updateData(firstSchool);
 });
