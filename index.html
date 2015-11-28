@@ -1,21 +1,22 @@
 <!doctype html>
-<html>
+<html ng-app="sgtApp">
 <head>
     <link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css">
     <script src="http://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
     <script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.min.js"></script>
-    <script src="oop_sgt.js"></script>
+    <script src="https://rawgit.com/angular/bower-angular/master/angular.min.js"></script>
+    <script src="ng_sgt.js"></script>
     <meta name="viewport" content="initial-scale=1, user-scalable=no">
     <style>
         .loading_modal {
-            display:    none;
-            position:   fixed;
-            z-index:    1000;
-            top:        0;
-            left:       0;
-            height:     100%;
-            width:      100%;
-            background: rgba( 255, 255, 255, .8 ) url('ajax-loader.gif') 50% 50% no-repeat;
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            top: 0;
+            left: 0;
+            height: 100%;
+            width: 100%;
+            background: rgba(255, 255, 255, .8) url('ajax-loader.gif') 50% 50% no-repeat;
         }
 
         body.loading {
@@ -27,7 +28,7 @@
         }
     </style>
 </head>
-<body class="container-fluid">
+<body class="container-fluid" ng-controller="appController as ac">
 <div class="row">
     <div class="col-sm-12 page-header">
         <!-- only show this element when the isnt on mobile -->
@@ -39,33 +40,35 @@
             <small class="pull-right">Grade Average : <span class="avgGrade label label-default">0</span></small>
         </h3>
     </div>
-    <div class="student-add-form form-group col-sm-4 col-sm-push-8">
+    <div class="student-add-form form-group col-sm-4 col-sm-push-8" ng-controller="formController as fc">
         <h4>Add Student</h4>
+
         <div class="input-group form-group">
             <span class="input-group-addon">
                 <span class="glyphicon glyphicon-user"></span>
             </span>
-            <input type="text" class="form-control" name="studentName" id="name" placeholder="Student Name">
+            <input type="text" class="form-control" name="studentName" id="name" placeholder="Student Name"
+                   ng-model="newStudent.name">
         </div>
         <div class="input-group form-group">
             <span class="input-group-addon">
                 <span class="glyphicon glyphicon-list-alt"></span>
             </span>
             <input type="text" class="form-control" name="course" id="course"
-                   placeholder="Student Course">
+                   placeholder="Student Course" ng-model="newStudent.course">
         </div>
         <div class="input-group form-group">
             <span class="input-group-addon">
                 <span class="glyphicon glyphicon-education"></span>
             </span>
             <input type="number" class="form-control" name="studentGrade" id="grade"
-                   placeholder="Student Grade">
+                   placeholder="Student Grade" ng-model="newStudent.grade">
         </div>
-        <button type="button" class="btn btn-success" onclick="addClicked(firstSchool)">Add</button>
-        <button type="button" class="btn btn-default" onclick="cancelClicked(firstSchool)">Cancel</button>
-        <button type="button" class="btn btn-info" onclick="dbClicked(firstSchool)">Populate From DB</button>
+        <button type="button" class="btn btn-success" ng-click="fc.addStudent()">Add</button>
+        <button type="button" class="btn btn-default" ng-click="newStudent = {}">Cancel</button>
+        <button type="button" class="btn btn-info">Populate From DB</button>
     </div>
-    <div class="student-list-container col-sm-8 col-sm-pull-4">
+    <div class="student-list-container col-sm-8 col-sm-pull-4" ng-controller="studentListController as slc">
         <table class="student-list table table-condensed">
             <thead>
             <tr>
@@ -76,6 +79,14 @@
             </tr>
             </thead>
             <tbody>
+            <tr ng-repeat="student in studentArray">
+                <td>{{ student.name }}</td>
+                <td>{{ student.course }}</td>
+                <td>{{ student.grade }}</td>
+                <td>
+                    <button ng-click="slc.deleteStudent($index)">Delete</button>
+                </td>
+            </tr>
             </tbody>
         </table>
     </div>
