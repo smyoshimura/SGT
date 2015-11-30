@@ -24,9 +24,31 @@ app.controller('appController', function ($scope) {
         }
 
         return average;
-    }
-});
+    };
 
+    this.getStudentDB = function () {
+        $.ajax({
+            dataType: 'json',
+            method: 'POST',
+            url: 'http://s-apis.learningfuze.com/sgt/get',
+            data: {api_key: 'amZ9Q5UEUU'},
+
+            success: function (result) {
+                console.log('Ajax call result:', result);
+
+                for (var x in result.data) {
+                    $scope.newStudent.name = result.data[x].name;
+                    $scope.newStudent.course = result.data[x].course;
+                    $scope.newStudent.grade = result.data[x].grade;
+                    $scope.newStudent.id = result.data[x].id;
+                    $scope.studentArray.push($scope.newStudent);
+                    $scope.newStudent = {};
+                    $scope.$digest();
+                }
+            }
+        })
+    };
+});
 
 app.controller('formController', function ($scope) {
     this.addStudent = function () {
@@ -34,7 +56,6 @@ app.controller('formController', function ($scope) {
         $scope.newStudent = {};
     }
 });
-
 
 app.controller('studentListController', function ($scope) {
     this.deleteStudent = function ($index) {

@@ -33,11 +33,11 @@
     <div class="col-sm-12 page-header">
         <!-- only show this element when the isnt on mobile -->
         <h1 class="hidden-xs">Student Grade Table
-            <small class="pull-right">Grade Average : <span class="avgGrade label label-default">{{ ac.calculateAverage() }}</span></small>
+            <small class="pull-right">Grade Average: <span class="avgGrade label label-default">{{ ac.calculateAverage() }}</span></small>
         </h1>
         <!-- only show this element when the user gets to a mobile version -->
         <h3 class="visible-xs">Student Grade Table
-            <small class="pull-right">Grade Average : <span class="avgGrade label label-default">{{ ac.calculateAverage() }}</span></small>
+            <small class="pull-right">Grade Average: <span class="avgGrade label label-default">{{ ac.calculateAverage() }}</span></small>
         </h3>
     </div>
     <div class="student-add-form form-group col-sm-4 col-sm-push-8" ng-controller="formController as fc">
@@ -62,11 +62,11 @@
                 <span class="glyphicon glyphicon-education"></span>
             </span>
             <input type="number" class="form-control" name="studentGrade" id="grade"
-                   placeholder="Student Grade" ng-model="newStudent.grade">
+                   placeholder="Student Grade" ng-model="newStudent.grade" ng-min="1" ng-max="3" min="0" max="100">
         </div>
         <button type="button" class="btn btn-success" ng-click="fc.addStudent()">Add</button>
         <button type="button" class="btn btn-default" ng-click="newStudent = {}">Cancel</button>
-        <button type="button" class="btn btn-info">Populate From DB</button>
+        <button type="button" class="btn btn-info" ng-click="ac.getStudentDB()">Populate From DB</button>
     </div>
     <div class="student-list-container col-sm-8 col-sm-pull-4" ng-controller="studentListController as slc">
         <table class="student-list table table-condensed">
@@ -84,7 +84,7 @@
                 <td>{{ student.course }}</td>
                 <td>{{ student.grade }}</td>
                 <td>
-                    <button ng-click="slc.deleteStudent($index)">Delete</button>
+                    <button class="btn btn-danger" ng-click="slc.deleteStudent($index)">Delete</button>
                 </td>
             </tr>
             </tbody>
