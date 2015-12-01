@@ -62,9 +62,9 @@
                 <span class="glyphicon glyphicon-education"></span>
             </span>
             <input type="number" class="form-control" name="studentGrade" id="grade"
-                   placeholder="Student Grade" ng-model="newStudent.grade" ng-min="1" ng-max="3" min="0" max="100">
+                   placeholder="Student Grade" ng-model="newStudent.grade" ng-min="0" ng-max="100" min="0" max="100">
         </div>
-        <button type="button" class="btn btn-success" ng-click="fc.addStudent()">Add</button>
+        <button type="button" class="btn btn-success" ng-click="fc.addStudentToDB()">Add</button>
         <button type="button" class="btn btn-default" ng-click="newStudent = {}">Cancel</button>
         <button type="button" class="btn btn-info" ng-click="ac.getStudentDB()">Populate From DB</button>
     </div>
@@ -84,7 +84,7 @@
                 <td>{{ student.course }}</td>
                 <td>{{ student.grade }}</td>
                 <td>
-                    <button class="btn btn-danger" ng-click="slc.deleteStudent($index)">Delete</button>
+                    <button class="btn btn-danger" ng-click="slc.removeStudentFromDB($index)">Delete</button>
                 </td>
             </tr>
             </tbody>

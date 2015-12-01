@@ -37,28 +37,76 @@ app.controller('appController', function ($scope) {
                 console.log('Ajax call result:', result);
 
                 for (var x in result.data) {
-                    $scope.newStudent.name = result.data[x].name;
-                    $scope.newStudent.course = result.data[x].course;
-                    $scope.newStudent.grade = result.data[x].grade;
-                    $scope.newStudent.id = result.data[x].id;
+                    $scope.newStudent = result.data[x];
+
                     $scope.studentArray.push($scope.newStudent);
+
                     $scope.newStudent = {};
-                    $scope.$digest();
                 }
+
+                $scope.$digest();
             }
         })
     };
 });
 
 app.controller('formController', function ($scope) {
-    this.addStudent = function () {
+    var self = this;
+
+    self.addStudentFromForm = function () {
         $scope.studentArray.push($scope.newStudent);
         $scope.newStudent = {};
-    }
+    };
+
+    self.addStudentToDB = function () {
+        $.ajax({
+            dataType: 'json',
+            method: 'POST',
+            url: 'http://s-apis.learningfuze.com/sgt/create',
+            data: {
+                api_key: 'amZ9Q5UEUU',
+                name: $scope.newStudent.name,
+                course: $scope.newStudent.course,
+                grade: $scope.newStudent.grade
+            },
+
+            success: function (result) {
+                console.log(result);
+
+                $scope.newStudent.id = result.new_id;
+
+                self.addStudentFromForm();
+
+                $scope.$digest()
+            }
+        })
+    };
 });
 
 app.controller('studentListController', function ($scope) {
-    this.deleteStudent = function ($index) {
+    var self = this;
+
+    self.deleteStudent = function ($index) {
         $scope.studentArray.splice($index, 1);
+        console.log($scope.studentArray);
+    };
+
+    self.removeStudentFromDB = function ($index) {
+        var student_id = $scope.studentArray[$index].id;
+
+        $.ajax({
+            dataType: 'json',
+            method: 'POST',
+            url: 'http://s-apis.learningfuze.com/sgt/delete',
+            data: {api_key: 'amZ9Q5UEUU', student_id: student_id},
+
+            success: function (result) {
+                console.log(result);
+
+                self.deleteStudent($index);
+
+                $scope.$digest()
+            }
+        })
     }
 });
