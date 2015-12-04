@@ -1,8 +1,23 @@
 var app = angular.module('sgtApp', []);
 
-app.controller('appController', function ($scope) {
-    $scope.newStudent = {};
-    $scope.studentArray = [];
+app.service("studentService", function (){
+   var self = this;
+
+    self.studentArray = [];
+
+    self.addStudentToArray = function (student) {
+        self.studentArray.push(student);
+    };
+
+    self.returnArray = function () {
+        return self.studentArray;
+    };
+
+});
+
+app.controller('appController', function ($scope, studentService) {
+    var selfApp = this;
+
     $scope.averageGrade = 0;
 
     this.calculateAverage = function () {
@@ -50,15 +65,19 @@ app.controller('appController', function ($scope) {
     };
 });
 
-app.controller('formController', function ($scope) {
-    var self = this;
+app.controller('formController', function ($scope, studentService) {
+    var selfForm = this;
 
-    self.addStudentFromForm = function () {
-        $scope.studentArray.push($scope.newStudent);
-        $scope.newStudent = {};
+    selfForm.addStudentFromForm = function () {
+        studentService.addStudentToArray(this.newStudent);
     };
 
     self.addStudentToDB = function () {
+        /*error checking for empty fields
+        if ($scope.student.name ) {
+
+        };*/
+
         $.ajax({
             dataType: 'json',
             method: 'POST',
@@ -83,15 +102,17 @@ app.controller('formController', function ($scope) {
     };
 });
 
-app.controller('studentListController', function ($scope) {
-    var self = this;
+app.controller('studentListController', function ($scope, studentService) {
+    var selfSL = this;
 
-    self.deleteStudent = function ($index) {
+    selfSL.slcArray = studentService.returnArray();
+
+    selfSL.deleteStudent = function ($index) {
         $scope.studentArray.splice($index, 1);
         console.log($scope.studentArray);
     };
 
-    self.removeStudentFromDB = function ($index) {
+    selfSL.removeStudentFromDB = function ($index) {
         var student_id = $scope.studentArray[$index].id;
 
         $.ajax({
