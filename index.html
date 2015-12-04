@@ -48,24 +48,24 @@
                 <span class="glyphicon glyphicon-user"></span>
             </span>
             <input type="text" class="form-control" name="studentName" id="name" placeholder="Student Name"
-                   ng-model="newStudent.name">
+                   ng-model="fc.newStudent.name">
         </div>
         <div class="input-group form-group">
             <span class="input-group-addon">
                 <span class="glyphicon glyphicon-list-alt"></span>
             </span>
             <input type="text" class="form-control" name="course" id="course"
-                   placeholder="Student Course" ng-model="newStudent.course">
+                   placeholder="Student Course" ng-model="fc.newStudent.course">
         </div>
         <div class="input-group form-group">
             <span class="input-group-addon">
                 <span class="glyphicon glyphicon-education"></span>
             </span>
             <input type="number" class="form-control" name="studentGrade" id="grade"
-                   placeholder="Student Grade" ng-model="newStudent.grade" ng-min="0" ng-max="100" min="0" max="100">
+                   placeholder="Student Grade" ng-model="fc.newStudent.grade" ng-min="0" ng-max="100" min="0" max="100">
         </div>
         <button type="button" class="btn btn-success" ng-click="fc.addStudentFromForm()">Add</button>
-        <button type="button" class="btn btn-default" ng-click="newStudent = {}">Cancel</button>
+        <button type="button" class="btn btn-default" ng-click="fc.newStudent = {}">Cancel</button>
         <button type="button" class="btn btn-info" ng-click="ac.getStudentDB()">Populate From DB</button>
     </div>
     <div class="student-list-container col-sm-8 col-sm-pull-4" ng-controller="studentListController as slc">
@@ -84,7 +84,7 @@
                 <td>{{ student.course }}</td>
                 <td>{{ student.grade }}</td>
                 <td>
-                    <button class="btn btn-danger" ng-click="slc.removeStudentFromDB($index)">Delete</button>
+                    <button class="btn btn-danger" ng-click="slc.removeStudent($index)">Delete</button>
                 </td>
             </tr>
             </tbody>

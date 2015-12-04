@@ -13,6 +13,10 @@ app.service("studentService", function (){
         return self.studentArray;
     };
 
+    self.deleteStudentInArray = function (index) {
+        self.studentArray.splice(index, 1);
+        console.log(self.studentArray);
+    };
 });
 
 app.controller('appController', function ($scope, studentService) {
@@ -70,6 +74,7 @@ app.controller('formController', function ($scope, studentService) {
 
     selfForm.addStudentFromForm = function () {
         studentService.addStudentToArray(this.newStudent);
+        this.newStudent = {};
     };
 
     self.addStudentToDB = function () {
@@ -107,9 +112,8 @@ app.controller('studentListController', function ($scope, studentService) {
 
     selfSL.slcArray = studentService.returnArray();
 
-    selfSL.deleteStudent = function ($index) {
-        $scope.studentArray.splice($index, 1);
-        console.log($scope.studentArray);
+    selfSL.removeStudent = function (index) {
+        studentService.deleteStudentInArray(index);
     };
 
     selfSL.removeStudentFromDB = function ($index) {
