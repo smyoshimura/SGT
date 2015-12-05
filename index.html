@@ -66,7 +66,7 @@
         </div>
         <button type="button" class="btn btn-success" ng-click="fc.addStudentFromForm()">Add</button>
         <button type="button" class="btn btn-default" ng-click="fc.newStudent = {}">Cancel</button>
-        <button type="button" class="btn btn-info" ng-click="ac.getStudentDB()">Populate From DB</button>
+        <button type="button" class="btn btn-info" ng-click="ac.requestDB()">Populate From DB</button>
     </div>
     <div class="student-list-container col-sm-8 col-sm-pull-4" ng-controller="studentListController as slc">
         <table class="student-list table table-condensed">
@@ -79,7 +79,7 @@
             </tr>
             </thead>
             <tbody>
-            <tr ng-repeat="student in slc.slcArray">
+            <tr ng-repeat="student in slc.slcArray()">
                 <td>{{ student.name }}</td>
                 <td>{{ student.course }}</td>
                 <td>{{ student.grade }}</td>
