@@ -4,13 +4,13 @@ var app = angular.module('sgtApp', []);
 app.provider('sgtData', function () {
     var selfHTTP = this;
 
+    //Configurable properties
     selfHTTP.apiKey = "";
     selfHTTP.apiGetUrl = "";
     selfHTTP.apiCreateUrl = "";
     selfHTTP.apiDeleteUrl = "";
 
-    selfHTTP.data = {};
-
+    //All database calls
     selfHTTP.$get = function ($http) {
         return {
             returnStudentData: function () {
@@ -25,8 +25,6 @@ app.provider('sgtData', function () {
             },
 
             addStudentData: function (student) {
-                console.log('Running add request');
-
                 var dataObj = $.param({
                     api_key: "amZ9Q5UEUU",
                     name: student.name,
@@ -48,8 +46,6 @@ app.provider('sgtData', function () {
                     student_id: id
                 });
 
-                console.log('Running delete request');
-
                 return $http({
                     url: selfHTTP.apiDeleteUrl,
                     method: 'POST',
@@ -61,7 +57,7 @@ app.provider('sgtData', function () {
     };
 });
 
-//Config your provider here to set the apiKey and the api urls
+//Config provider here to set the apiKey and the api urls
 app.config(function (sgtDataProvider) {
     sgtDataProvider.apiKey = "api_key=amZ9Q5UEUU";
     sgtDataProvider.apiGetUrl = "http://s-apis.learningfuze.com/sgt/get";
@@ -69,7 +65,7 @@ app.config(function (sgtDataProvider) {
     sgtDataProvider.apiDeleteUrl = "http://s-apis.learningfuze.com/sgt/delete";
 });
 
-//Manages adding and deleting of students
+//Manages adding and deleting of students from array and makes provider requests
 app.service("studentService", function (sgtData) {
     var selfSS = this;
 
@@ -125,7 +121,8 @@ app.service("studentService", function (sgtData) {
     }
 });
 
-app.controller('appController', function ($scope, studentService, sgtData) {
+//Handles grade average and general database request
+app.controller('appController', function (studentService) {
     var selfApp = this;
 
     selfApp.averageGrade = 0;
@@ -155,103 +152,25 @@ app.controller('appController', function ($scope, studentService, sgtData) {
     selfApp.requestDB = function () {
         studentService.getStudentDB();
     };
-
-    /*this.getStudentDB = function () {
-     $.ajax({
-     dataType: 'json',
-     method: 'POST',
-     url: 'http://s-apis.learningfuze.com/sgt/get',
-     data: {api_key: 'amZ9Q5UEUU'},
-
-     success: function (result) {
-     console.log('Ajax call result:', result);
-
-     for (var x in result.data) {
-     $scope.newStudent = result.data[x];
-
-     $scope.studentArray.push($scope.newStudent);
-
-     $scope.newStudent = {};
-     }
-
-     $scope.$digest();
-     }
-     })
-     };*/
 });
 
-app.controller('formController', function ($scope, studentService, sgtData) {
+//Handles from inputs and requests adding of students to array and database
+app.controller('formController', function (studentService) {
     var selfForm = this;
-
-    selfForm.addStudentFromForm = function () {
-        studentService.addStudentToArray(selfForm.newStudent);
-        selfForm.newStudent = {};
-    };
 
     selfForm.addStudentToDB = function () {
         studentService.addStudentDB(selfForm.newStudent);
         selfForm.newStudent = {};
     };
-
-    /*self.addStudentToDB = function () {
-     /!*error checking for empty fields
-     if ($scope.student.name ) {
-
-     };*!/
-
-     $.ajax({
-     dataType: 'json',
-     method: 'POST',
-     url: 'http://s-apis.learningfuze.com/sgt/create',
-     data: {
-     api_key: 'amZ9Q5UEUU',
-     name: $scope.newStudent.name,
-     course: $scope.newStudent.course,
-     grade: $scope.newStudent.grade
-     },
-
-     success: function (result) {
-     console.log(result);
-
-     $scope.newStudent.id = result.new_id;
-
-     self.addStudentFromForm();
-
-     $scope.$digest()
-     }
-     })
-     };*/
 });
 
-app.controller('studentListController', function ($scope, studentService, sgtData) {
+//Handles outputting student table info and requests student removal from array and database
+app.controller('studentListController', function (studentService) {
     var selfSL = this;
 
     selfSL.slcArray = studentService.returnArray;
 
-    selfSL.removeStudent = function (index) {
-        studentService.deleteStudentInArray(index);
-    };
-
     selfSL.requestRemove = function (index) {
         studentService.removeStudentDB(index);
     };
-
-    /*selfSL.removeStudentFromDB = function ($index) {
-     var student_id = $scope.studentArray[$index].id;
-
-     $.ajax({
-     dataType: 'json',
-     method: 'POST',
-     url: 'http://s-apis.learningfuze.com/sgt/delete',
-     data: {api_key: 'amZ9Q5UEUU', student_id: student_id},
-
-     success: function (result) {
-     console.log(result);
-
-     self.deleteStudent($index);
-
-     $scope.$digest()
-     }
-     })
-     }*/
 });
