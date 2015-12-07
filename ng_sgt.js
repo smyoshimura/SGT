@@ -22,6 +22,40 @@ app.provider('sgtData', function () {
                     data: selfHTTP.apiKey,
                     headers: {'Content-Type': 'application/x-www-form-urlencoded'}
                 });
+            },
+
+            addStudentData: function (student) {
+                console.log('Running add request');
+
+                var dataObj = $.param({
+                    api_key: "amZ9Q5UEUU",
+                    name: student.name,
+                    course: student.course,
+                    grade: student.grade
+                });
+
+                return $http({
+                    url: selfHTTP.apiCreateUrl,
+                    method: 'POST',
+                    data: dataObj,
+                    headers: {'Content-Type': 'application/x-www-form-urlencoded'}
+                });
+            },
+
+            deleteStudentData: function (id) {
+                var dataObj = $.param({
+                    api_key: "amZ9Q5UEUU",
+                    student_id: id
+                });
+
+                console.log('Running delete request');
+
+                return $http({
+                    url: selfHTTP.apiDeleteUrl,
+                    method: 'POST',
+                    data: dataObj,
+                    headers: {'Content-Type': 'application/x-www-form-urlencoded'}
+                });
             }
         }
     };
@@ -35,7 +69,7 @@ app.config(function (sgtDataProvider) {
     sgtDataProvider.apiDeleteUrl = "http://s-apis.learningfuze.com/sgt/delete";
 });
 
-//Managed adding and deleting of students
+//Manages adding and deleting of students
 app.service("studentService", function (sgtData) {
     var selfSS = this;
 
@@ -47,6 +81,7 @@ app.service("studentService", function (sgtData) {
 
     selfSS.addStudentToArray = function (student) {
         selfSS.studentArray.push(student);
+        console.log('studentArray: ', selfSS.studentArray);
     };
 
     selfSS.deleteStudentInArray = function (index) {
@@ -64,6 +99,30 @@ app.service("studentService", function (sgtData) {
                 console.log('Error');
             });
     };
+
+    selfSS.addStudentDB = function (student) {
+        var tempStudent = student;
+        sgtData.addStudentData(student)
+            .then(function (response) {
+                console.log(".then: ", response);
+                tempStudent['id'] = response.data.new_id;
+                selfSS.addStudentToArray(tempStudent);
+            }, function () {
+                console.log('Error');
+            });
+    };
+
+    selfSS.removeStudentDB = function (index) {
+        var tempID = selfSS.studentArray[index].id;
+
+        sgtData.deleteStudentData(tempID)
+            .then(function (response) {
+                console.log(".then: ", response);
+                selfSS.deleteStudentInArray(index);
+            }, function () {
+                console.log('Error');
+            });
+    }
 });
 
 app.controller('appController', function ($scope, studentService, sgtData) {
@@ -129,6 +188,11 @@ app.controller('formController', function ($scope, studentService, sgtData) {
         selfForm.newStudent = {};
     };
 
+    selfForm.addStudentToDB = function () {
+        studentService.addStudentDB(selfForm.newStudent);
+        selfForm.newStudent = {};
+    };
+
     /*self.addStudentToDB = function () {
      /!*error checking for empty fields
      if ($scope.student.name ) {
@@ -166,6 +230,10 @@ app.controller('studentListController', function ($scope, studentService, sgtDat
 
     selfSL.removeStudent = function (index) {
         studentService.deleteStudentInArray(index);
+    };
+
+    selfSL.requestRemove = function (index) {
+        studentService.removeStudentDB(index);
     };
 
     /*selfSL.removeStudentFromDB = function ($index) {
