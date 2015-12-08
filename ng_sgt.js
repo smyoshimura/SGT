@@ -15,19 +15,26 @@ app.provider('sgtData', function () {
     //All database calls
     selfHTTP.$get = function ($http, $q) {
         return {
-             returnStudentData: function () {
-                 var defer = $q.defer();
+            returnStudentData: function () {
+                var defer = $q.defer();
 
-                 firebaseRef.on("child_added", function (snapshot) {
-                     console.log(snapshot.val());
-                     defer.resolve(snapshot.val());
-                 }, function (errorObject) {
-                     console.log("The read failed: " + errorObject.code);
-                     defer.reject();
-                 });
+                var promises = [];
 
-                 return defer.promise;
-             },
+                firebaseRef.on("child_added", function (snapshot) {
+                    console.log('child_added snapshot: ', snapshot.val());
+                    promises.push(snapshot.val());
+                    defer.resolve(promises);
+                    console.log('promises array is: ', promises);
+
+                }, function (errorObject) {
+
+                    console.log("The read failed: " + errorObject.code);
+
+                    defer.reject();
+                });
+
+                return defer.promise
+            },
 
             addStudentData: function (student) {
                 firebaseRef.push(student);
@@ -83,7 +90,8 @@ app.service("studentService", function (sgtData, $q) {
     selfSS.getStudentDB = function () {
         sgtData.returnStudentData()
             .then(function (snapshot) {
-                selfSS.studentArray.push(snapshot);
+                console.log('return student data snapshot val is: ', snapshot);
+                selfSS.studentArray=(snapshot);
                 console.log(selfSS.studentArray);
             }, function () {
                 console.log('Error');
