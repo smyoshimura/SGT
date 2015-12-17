@@ -4,12 +4,6 @@ var app = angular.module('sgtApp', []);
 app.provider('sgtData', function () {
     var selfHTTP = this;
 
-    //Configurable properties
-    /*    selfHTTP.apiKey = "";
-     selfHTTP.apiGetUrl = "";
-     selfHTTP.apiCreateUrl = "";
-     selfHTTP.apiDeleteUrl = "";*/
-
     var firebaseRef = new Firebase("https://dazzling-torch-4855.firebaseio.com/data/students");
 
     //All database calls
@@ -21,10 +15,14 @@ app.provider('sgtData', function () {
                 var promises = [];
 
                 firebaseRef.on("child_added", function (snapshot) {
-                    console.log('child_added snapshot: ', snapshot.val());
-                    promises.push(snapshot.val());
+                    var studentObj = snapshot.val();
+                    studentObj.id = snapshot.key();
+
+                    console.log('child_added snapshot: ', studentObj);
+
+                    promises.push(studentObj);
+
                     defer.resolve(promises);
-                    console.log('promises array is: ', promises);
 
                 }, function (errorObject) {
 
@@ -38,32 +36,32 @@ app.provider('sgtData', function () {
 
             addStudentData: function (student) {
                 firebaseRef.push(student);
+            },
+
+            deleteStudentData: function (id) {
+                var removalStudent = firebaseRef.child(id);
+
+                var defer = $q.defer();
+
+                firebaseRef.on('child_removed', function (snapshot) {
+
+                    console.log('child_removed snapshot: ', snapshot.val());
+
+                    defer.resolve("Success!");
+
+                }, function (errorObject) {
+                    console.log("The delete failed: " + errorObject.code);
+
+                    defer.reject();
+                });
+
+                removalStudent.remove();
+
+                return defer.promise;
             }
-
-            /*deleteStudentData: function (id) {
-             var dataObj = $.param({
-             api_key: "amZ9Q5UEUU",
-             student_id: id
-             });
-
-             return $http({
-             url: selfHTTP.apiDeleteUrl,
-             method: 'POST',
-             data: dataObj,
-             headers: {'Content-Type': 'application/x-www-form-urlencoded'}
-             });
-             }*/
         }
     };
 });
-
-//Config provider here to set the apiKey and the api urls
-/*app.config(function (sgtDataProvider) {
- sgtDataProvider.apiKey = "api_key=amZ9Q5UEUU";
- sgtDataProvider.apiGetUrl = "http://s-apis.learningfuze.com/sgt/get";
- sgtDataProvider.apiCreateUrl = "http://s-apis.learningfuze.com/sgt/create";
- sgtDataProvider.apiDeleteUrl = "http://s-apis.learningfuze.com/sgt/delete";
- });*/
 
 //Manages adding and deleting of students from array and makes provider requests
 app.service("studentService", function (sgtData, $q) {
@@ -82,17 +80,18 @@ app.service("studentService", function (sgtData, $q) {
         console.log('studentArray: ', selfSS.studentArray);
     };
 
-    /*selfSS.deleteStudentInArray = function (index) {
+    selfSS.deleteStudentInArray = function (index) {
      selfSS.studentArray.splice(index, 1);
-     console.log(selfSS.studentArray);
-     };*/
+     console.log("Current studentArray: ", selfSS.studentArray);
+     };
 
     selfSS.getStudentDB = function () {
         sgtData.returnStudentData()
             .then(function (snapshot) {
-                console.log('return student data snapshot val is: ', snapshot);
-                selfSS.studentArray=(snapshot);
-                console.log(selfSS.studentArray);
+                selfSS.studentArray = snapshot;
+
+                console.log('Current studentArray: ', selfSS.studentArray);
+
             }, function () {
                 console.log('Error');
             })
@@ -106,24 +105,29 @@ app.service("studentService", function (sgtData, $q) {
         selfSS.addStudentToArray(tempStudent);
     };
 
-    /* selfSS.removeStudentDB = function (index) {
-     var tempID = selfSS.studentArray[index].id;
+    selfSS.removeStudentDB = function (index) {
+        var tempID = selfSS.studentArray[index].id;
 
-     sgtData.deleteStudentData(tempID)
-     .then(function (response) {
-     console.log(".then: ", response);
-     selfSS.deleteStudentInArray(index);
-     }, function () {
-     console.log('Error');
-     });
-     }*/
+        console.log('tempID: ', tempID);
+
+        sgtData.deleteStudentData(tempID)
+            .then(function (response) {
+                console.log(response);
+
+                selfSS.deleteStudentInArray(index);
+
+                console.log('Current studentArray: ', selfSS.studentArray);
+            }, function () {
+                console.log('Error')
+            });
+    }
 });
 
 //Handles grade average and general database request
 app.controller('appController', function (studentService) {
     var selfApp = this;
 
-    /*selfApp.averageGrade = 0;
+    selfApp.averageGrade = 0;
 
      selfApp.calculateAverage = function () {
      var totalGrades = 0;
@@ -145,7 +149,7 @@ app.controller('appController', function (studentService) {
      }
 
      return average;
-     };*/
+     };
 
     selfApp.requestDB = function () {
         studentService.getStudentDB();
@@ -168,7 +172,7 @@ app.controller('studentListController', function (studentService) {
 
     selfSL.slcArray = studentService.returnArray;
 
-    /*selfSL.requestRemove = function (index) {
+    selfSL.requestRemove = function (index) {
      studentService.removeStudentDB(index);
-     };*/
+     };
 });
